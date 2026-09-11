@@ -30,12 +30,16 @@ static void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t
 // Touch input read callback for XPT2046
 static void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data) {
     uint16_t touchX = 0, touchY = 0;
-    bool touched = s_tft.getTouch(&touchX, &touchY, 600);
+    // Lower threshold to 150 for high touch sensitivity
+    bool touched = s_tft.getTouchRaw(&touchX, &touchY);
 
     static bool s_last_touched = false;
     static uint32_t s_touch_press_time = 0;
 
-    if (touched) {
+    // PIN_TOUCH_IRQ is active LOW on CYD (GPIO 36)
+    bool hw_touched = (digitalRead(PIN_TOUCH_IRQ) == LOW) || touched;
+
+    if (hw_touched) {
         data->state = LV_INDEV_STATE_PR;
         data->point.x = touchX;
         data->point.y = touchY;
@@ -46,11 +50,11 @@ static void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data
         s_last_touched = true;
     } else {
         data->state = LV_INDEV_STATE_REL;
-        // Detect tap release (short press between 50ms and 800ms)
+        // Detect tap release (short press between 30ms and 1500ms)
         if (s_last_touched) {
             uint32_t press_duration = millis() - s_touch_press_time;
-            if (press_duration > 50 && press_duration < 800) {
-                LOG_I("Screen tapped! Toggling Mirror HUD mode");
+            if (press_duration >= 30 && press_duration <= 1500) {
+                LOG_I("Screen tap detected! Toggling Mirror HUD mode");
                 DisplayDriver::toggleMirror();
             }
         }
@@ -101,21 +105,20 @@ static void renderTask(void* param) {
 bool DisplayDriver::init(SemaphoreHandle_t lvgl_mutex) {
     s_lvgl_mutex = lvgl_mutex;
 
-    // 1. Backlight PWM setup
+    // 1. Configure Touch IRQ pin
+    pinMode(PIN_TOUCH_IRQ, INPUT_PULLUP);
+
+    // 2. Backlight PWM setup
     ledcSetup(BL_PWM_CHANNEL, BL_PWM_FREQ, BL_PWM_RES_BITS);
     ledcAttachPin(PIN_TFT_BL, BL_PWM_CHANNEL);
     setBrightness(NvsConfig::get().brightness);
 
-    // 2. Hardware Display init
+    // 3. Hardware Display init
     s_tft.init();
     s_tft.setRotation(DISPLAY_ROTATION); // Default: 1 (Landscape)
     s_tft.fillScreen(TFT_BLACK);
 
-    // Set default touch calibration for CYD 2.8" (320x240)
-    uint16_t calData[5] = { 300, 3500, 300, 3500, 7 };
-    s_tft.setTouch(calData);
-
-    // 3. LVGL Init
+    // 4. LVGL Init
     lv_init();
     lv_disp_draw_buf_init(&s_draw_buf, s_buf1, s_buf2, SCREEN_WIDTH * 20);
 
@@ -134,7 +137,7 @@ bool DisplayDriver::init(SemaphoreHandle_t lvgl_mutex) {
     indev_drv.read_cb = my_touchpad_read;
     lv_indev_drv_register(&indev_drv);
 
-    // 4. Initialize Screen elements
+    // 5. Initialize Screen elements
     HudScreen::init();
 
     LOG_I("Display and Touch initialized successfully (320x240)");
