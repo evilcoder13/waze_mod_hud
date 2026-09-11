@@ -8,5 +8,7 @@ class DisplayDriver {
 public:
     static bool init(SemaphoreHandle_t lvgl_mutex);
     static void setBrightness(uint8_t percent);
+    static void toggleMirror();
+    static bool isMirrored();
     static void startRenderTask();
 };
