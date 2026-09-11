@@ -10,29 +10,38 @@ static lv_obj_t* s_scr_connecting = nullptr;
 static lv_obj_t* s_scr_hud = nullptr;
 static lv_obj_t* s_scr_no_signal = nullptr;
 
-// HUD screen elements
-static lv_obj_t* s_bar_alert = nullptr;
-static lv_obj_t* s_lbl_alert = nullptr;
+// --- HUD Main Elements (Dashboard Style 320x240) ---
+// Left: Turn direction & Turn distance
+static lv_obj_t* s_lbl_turn_icon = nullptr;
+static lv_obj_t* s_lbl_turn_dst = nullptr;
 
+// Center: Current Speed & Speed Limit Sign
 static lv_obj_t* s_lbl_speed = nullptr;
 static lv_obj_t* s_lbl_speed_unit = nullptr;
 static lv_obj_t* s_obj_limit_circle = nullptr;
 static lv_obj_t* s_lbl_limit = nullptr;
 
-static lv_obj_t* s_lbl_turn_icon = nullptr;
-static lv_obj_t* s_lbl_turn_dst = nullptr;
-static lv_obj_t* s_lbl_turn_st2 = nullptr;
+// Right Top: Primary Alert (Icon + Distance in cyan/orange)
+static lv_obj_t* s_obj_alert_main = nullptr;
+static lv_obj_t* s_lbl_alert_icon = nullptr;
+static lv_obj_t* s_lbl_alert_dst = nullptr;
 
+// Right Bottom: Upcoming Speed Signs (alrs)
+static lv_obj_t* s_obj_alr1 = nullptr;
+static lv_obj_t* s_lbl_alr1_val = nullptr;
+static lv_obj_t* s_lbl_alr1_dst = nullptr;
+
+static lv_obj_t* s_obj_alr2 = nullptr;
+static lv_obj_t* s_lbl_alr2_val = nullptr;
+static lv_obj_t* s_lbl_alr2_dst = nullptr;
+
+// Bottom Section: Street & ETA
 static lv_obj_t* s_lbl_street = nullptr;
-static lv_obj_t* s_lbl_eta_row = nullptr;
-static lv_obj_t* s_lbl_dist_rem = nullptr;
-
-static lv_obj_t* s_bar_avg = nullptr;
-static lv_obj_t* s_lbl_avg = nullptr;
+static lv_obj_t* s_lbl_eta_info = nullptr;
 
 void HudScreen::createBootScreen() {
     s_scr_boot = lv_obj_create(nullptr);
-    lv_obj_set_style_bg_color(s_scr_boot, lv_color_hex(0x101018), 0);
+    lv_obj_set_style_bg_color(s_scr_boot, lv_color_hex(0x000000), 0);
 
     lv_obj_t* lbl = lv_label_create(s_scr_boot);
     lv_label_set_text(lbl, "WazeHUD CYD");
@@ -49,7 +58,7 @@ void HudScreen::createBootScreen() {
 
 void HudScreen::createConnectingScreen() {
     s_scr_connecting = lv_obj_create(nullptr);
-    lv_obj_set_style_bg_color(s_scr_connecting, lv_color_hex(0x101018), 0);
+    lv_obj_set_style_bg_color(s_scr_connecting, lv_color_hex(0x000000), 0);
 
     lv_obj_t* icon = lv_label_create(s_scr_connecting);
     lv_label_set_text(icon, LV_SYMBOL_BLUETOOTH);
@@ -72,7 +81,7 @@ void HudScreen::createConnectingScreen() {
 
 void HudScreen::createNoSignalScreen() {
     s_scr_no_signal = lv_obj_create(nullptr);
-    lv_obj_set_style_bg_color(s_scr_no_signal, lv_color_hex(0x1A1A2E), 0);
+    lv_obj_set_style_bg_color(s_scr_no_signal, lv_color_hex(0x000000), 0);
 
     lv_obj_t* lbl = lv_label_create(s_scr_no_signal);
     lv_label_set_text(lbl, "MẤT TÍN HIỆU");
@@ -89,125 +98,149 @@ void HudScreen::createNoSignalScreen() {
 
 void HudScreen::createHudScreen() {
     s_scr_hud = lv_obj_create(nullptr);
-    lv_obj_set_style_bg_color(s_scr_hud, lv_color_hex(0x1A1A2E), 0);
+    lv_obj_set_style_bg_color(s_scr_hud, lv_color_hex(0x000000), 0);
     lv_obj_clear_flag(s_scr_hud, LV_OBJ_FLAG_SCROLLABLE);
 
-    // 1. Alert Bar (Top: 320x30)
-    s_bar_alert = lv_obj_create(s_scr_hud);
-    lv_obj_set_size(s_bar_alert, 320, 30);
-    lv_obj_set_pos(s_bar_alert, 0, 0);
-    lv_obj_set_style_radius(s_bar_alert, 0, 0);
-    lv_obj_set_style_border_width(s_bar_alert, 0, 0);
-    lv_obj_set_style_bg_color(s_bar_alert, lv_color_hex(0xD32F2F), 0);
-    lv_obj_clear_flag(s_bar_alert, LV_OBJ_FLAG_SCROLLABLE);
+    // ==========================================
+    // 1. LEFT: Turn Indicator (Arrow + Distance)
+    // ==========================================
+    s_lbl_turn_icon = lv_label_create(s_scr_hud);
+    lv_label_set_text(s_lbl_turn_icon, "");
+    lv_obj_set_style_text_font(s_lbl_turn_icon, &lv_font_montserrat_48, 0);
+    lv_obj_set_style_text_color(s_lbl_turn_icon, lv_color_hex(0xFFFFFF), 0);
+    lv_obj_set_pos(s_lbl_turn_icon, 20, 20);
 
-    s_lbl_alert = lv_label_create(s_bar_alert);
-    lv_label_set_text(s_lbl_alert, "");
-    lv_obj_set_style_text_color(s_lbl_alert, lv_color_hex(0xFFFFFF), 0);
-    lv_obj_set_style_text_font(s_lbl_alert, &font_vietnam_16, 0);
-    lv_obj_align(s_lbl_alert, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_add_flag(s_bar_alert, LV_OBJ_FLAG_HIDDEN);
+    s_lbl_turn_dst = lv_label_create(s_scr_hud);
+    lv_label_set_text(s_lbl_turn_dst, "");
+    lv_obj_set_style_text_font(s_lbl_turn_dst, &font_vietnam_16, 0);
+    lv_obj_set_style_text_color(s_lbl_turn_dst, lv_color_hex(0xFFEB3B), 0); // Gold/Yellow
+    lv_obj_set_pos(s_lbl_turn_dst, 10, 85);
 
-    // 2. Left Section: Speed & Speed Limit
+    // ==========================================
+    // 2. CENTER: Speed & Speed Limit Sign
+    // ==========================================
     s_lbl_speed = lv_label_create(s_scr_hud);
     lv_label_set_text(s_lbl_speed, "0");
     lv_obj_set_style_text_font(s_lbl_speed, &lv_font_montserrat_48, 0);
     lv_obj_set_style_text_color(s_lbl_speed, lv_color_hex(0xFFFFFF), 0);
-    lv_obj_set_pos(s_lbl_speed, 18, 36);
+    lv_obj_set_pos(s_lbl_speed, 115, 20);
 
     s_lbl_speed_unit = lv_label_create(s_scr_hud);
     lv_label_set_text(s_lbl_speed_unit, "km/h");
     lv_obj_set_style_text_font(s_lbl_speed_unit, &font_vietnam_16, 0);
     lv_obj_set_style_text_color(s_lbl_speed_unit, lv_color_hex(0x9E9E9E), 0);
-    lv_obj_set_pos(s_lbl_speed_unit, 26, 92);
+    lv_obj_set_pos(s_lbl_speed_unit, 118, 85);
 
-    // Speed limit round sign
+    // Speed limit circle (Round sign, white background, red border, black text)
     s_obj_limit_circle = lv_obj_create(s_scr_hud);
-    lv_obj_set_size(s_obj_limit_circle, 44, 44);
-    lv_obj_set_pos(s_obj_limit_circle, 26, 120);
+    lv_obj_set_size(s_obj_limit_circle, 54, 54);
+    lv_obj_set_pos(s_obj_limit_circle, 175, 20);
     lv_obj_set_style_radius(s_obj_limit_circle, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_bg_color(s_obj_limit_circle, lv_color_hex(0xFFFFFF), 0);
-    lv_obj_set_style_border_color(s_obj_limit_circle, lv_color_hex(0xF44336), 0);
-    lv_obj_set_style_border_width(s_obj_limit_circle, 4, 0);
+    lv_obj_set_style_border_color(s_obj_limit_circle, lv_color_hex(0xE53935), 0);
+    lv_obj_set_style_border_width(s_obj_limit_circle, 5, 0);
     lv_obj_clear_flag(s_obj_limit_circle, LV_OBJ_FLAG_SCROLLABLE);
 
     s_lbl_limit = lv_label_create(s_obj_limit_circle);
-    lv_label_set_text(s_lbl_limit, "50");
+    lv_label_set_text(s_lbl_limit, "60");
     lv_obj_set_style_text_font(s_lbl_limit, &font_vietnam_24, 0);
     lv_obj_set_style_text_color(s_lbl_limit, lv_color_hex(0x000000), 0);
     lv_obj_align(s_lbl_limit, LV_ALIGN_CENTER, 0, 0);
     lv_obj_add_flag(s_obj_limit_circle, LV_OBJ_FLAG_HIDDEN);
 
-    // 3. Middle Section: Turn Arrow, Turn Distance, Next Street
-    s_lbl_turn_icon = lv_label_create(s_scr_hud);
-    lv_label_set_text(s_lbl_turn_icon, "");
-    lv_obj_set_style_text_font(s_lbl_turn_icon, &lv_font_montserrat_48, 0);
-    lv_obj_set_style_text_color(s_lbl_turn_icon, lv_color_hex(0x4FC3F7), 0);
-    lv_obj_set_pos(s_lbl_turn_icon, 142, 34);
+    // ==========================================
+    // 3. RIGHT TOP: Primary Alert (Icon + Distance)
+    // ==========================================
+    s_obj_alert_main = lv_obj_create(s_scr_hud);
+    lv_obj_set_size(s_obj_alert_main, 75, 60);
+    lv_obj_set_pos(s_obj_alert_main, 240, 15);
+    lv_obj_set_style_bg_opa(s_obj_alert_main, LV_OPA_TRANSP, 0);
+    lv_obj_set_style_border_width(s_obj_alert_main, 0, 0);
+    lv_obj_clear_flag(s_obj_alert_main, LV_OBJ_FLAG_SCROLLABLE);
 
-    s_lbl_turn_dst = lv_label_create(s_scr_hud);
-    lv_label_set_text(s_lbl_turn_dst, "");
-    lv_obj_set_width(s_lbl_turn_dst, 115);
-    lv_obj_set_style_text_align(s_lbl_turn_dst, LV_TEXT_ALIGN_CENTER, 0);
-    lv_obj_set_style_text_font(s_lbl_turn_dst, &font_vietnam_24, 0);
-    lv_obj_set_style_text_color(s_lbl_turn_dst, lv_color_hex(0xFFFFFF), 0);
-    lv_obj_set_pos(s_lbl_turn_dst, 108, 90);
+    s_lbl_alert_icon = lv_label_create(s_obj_alert_main);
+    lv_label_set_text(s_lbl_alert_icon, "");
+    lv_obj_set_style_text_font(s_lbl_alert_icon, &lv_font_montserrat_24, 0);
+    lv_obj_set_style_text_color(s_lbl_alert_icon, lv_color_hex(0x00E5FF), 0); // Cyan
+    lv_obj_align(s_lbl_alert_icon, LV_ALIGN_TOP_MID, 0, 0);
 
-    s_lbl_turn_st2 = lv_label_create(s_scr_hud);
-    lv_label_set_text(s_lbl_turn_st2, "");
-    lv_obj_set_width(s_lbl_turn_st2, 115);
-    lv_obj_set_style_text_align(s_lbl_turn_st2, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_long_mode(s_lbl_turn_st2, LV_LABEL_LONG_DOT);
-    lv_obj_set_style_text_font(s_lbl_turn_st2, &font_vietnam_16, 0);
-    lv_obj_set_style_text_color(s_lbl_turn_st2, lv_color_hex(0xB0BEC5), 0);
-    lv_obj_set_pos(s_lbl_turn_st2, 108, 125);
+    s_lbl_alert_dst = lv_label_create(s_obj_alert_main);
+    lv_label_set_text(s_lbl_alert_dst, "");
+    lv_obj_set_style_text_font(s_lbl_alert_dst, &font_vietnam_16, 0);
+    lv_obj_set_style_text_color(s_lbl_alert_dst, lv_color_hex(0xFFEB3B), 0); // Yellow
+    lv_obj_align(s_lbl_alert_dst, LV_ALIGN_BOTTOM_MID, 0, 0);
+    lv_obj_add_flag(s_obj_alert_main, LV_OBJ_FLAG_HIDDEN);
 
-    // 4. Right Section: ETA, Distance Remaining & Average Zone
-    s_lbl_eta_row = lv_label_create(s_scr_hud);
-    lv_label_set_text(s_lbl_eta_row, "");
-    lv_obj_set_width(s_lbl_eta_row, 96);
-    lv_obj_set_style_text_font(s_lbl_eta_row, &font_vietnam_16, 0);
-    lv_obj_set_style_text_color(s_lbl_eta_row, lv_color_hex(0x90CAF9), 0);
-    lv_obj_set_pos(s_lbl_eta_row, 224, 40);
+    // ==========================================
+    // 4. RIGHT BOTTOM: Upcoming Speed Signs (alrs)
+    // ==========================================
+    // Sign 1
+    s_obj_alr1 = lv_obj_create(s_scr_hud);
+    lv_obj_set_size(s_obj_alr1, 32, 32);
+    lv_obj_set_pos(s_obj_alr1, 240, 85);
+    lv_obj_set_style_radius(s_obj_alr1, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_bg_color(s_obj_alr1, lv_color_hex(0xFFFFFF), 0);
+    lv_obj_set_style_border_color(s_obj_alr1, lv_color_hex(0x00E5FF), 0);
+    lv_obj_set_style_border_width(s_obj_alr1, 2, 0);
+    lv_obj_clear_flag(s_obj_alr1, LV_OBJ_FLAG_SCROLLABLE);
 
-    s_lbl_dist_rem = lv_label_create(s_scr_hud);
-    lv_label_set_text(s_lbl_dist_rem, "");
-    lv_obj_set_width(s_lbl_dist_rem, 96);
-    lv_obj_set_style_text_font(s_lbl_dist_rem, &font_vietnam_16, 0);
-    lv_obj_set_style_text_color(s_lbl_dist_rem, lv_color_hex(0xE0E0E0), 0);
-    lv_obj_set_pos(s_lbl_dist_rem, 224, 70);
+    s_lbl_alr1_val = lv_label_create(s_obj_alr1);
+    lv_label_set_text(s_lbl_alr1_val, "80");
+    lv_obj_set_style_text_font(s_lbl_alr1_val, &font_vietnam_16, 0);
+    lv_obj_set_style_text_color(s_lbl_alr1_val, lv_color_hex(0x000000), 0);
+    lv_obj_align(s_lbl_alr1_val, LV_ALIGN_CENTER, 0, 0);
 
-    // Vietnam No-Passing Zone bar (Avg Zone)
-    s_bar_avg = lv_bar_create(s_scr_hud);
-    lv_obj_set_size(s_bar_avg, 94, 28);
-    lv_obj_set_pos(s_bar_avg, 222, 128);
-    lv_obj_set_style_bg_color(s_bar_avg, lv_color_hex(0x37474F), 0);
-    lv_obj_set_style_bg_color(s_bar_avg, lv_color_hex(0xFF5722), LV_PART_INDICATOR);
-    lv_bar_set_range(s_bar_avg, 0, 100);
+    s_lbl_alr1_dst = lv_label_create(s_scr_hud);
+    lv_label_set_text(s_lbl_alr1_dst, "");
+    lv_obj_set_style_text_font(s_lbl_alr1_dst, &font_vietnam_16, 0);
+    lv_obj_set_style_text_color(s_lbl_alr1_dst, lv_color_hex(0x00E5FF), 0);
+    lv_obj_set_pos(s_lbl_alr1_dst, 230, 120);
 
-    s_lbl_avg = lv_label_create(s_bar_avg);
-    lv_label_set_text(s_lbl_avg, "CẤM VƯỢT");
-    lv_obj_set_style_text_color(s_lbl_avg, lv_color_hex(0xFFFFFF), 0);
-    lv_obj_set_style_text_font(s_lbl_avg, &font_vietnam_16, 0);
-    lv_obj_align(s_lbl_avg, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_add_flag(s_bar_avg, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(s_obj_alr1, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(s_lbl_alr1_dst, LV_OBJ_FLAG_HIDDEN);
 
-    // 5. Bottom Street Bar (y: 202..240, 320x38)
-    lv_obj_t* bar_street = lv_obj_create(s_scr_hud);
-    lv_obj_set_size(bar_street, 320, 38);
-    lv_obj_set_pos(bar_street, 0, 202);
-    lv_obj_set_style_radius(bar_street, 0, 0);
-    lv_obj_set_style_border_width(bar_street, 0, 0);
-    lv_obj_set_style_bg_color(bar_street, lv_color_hex(0x10101F), 0);
-    lv_obj_clear_flag(bar_street, LV_OBJ_FLAG_SCROLLABLE);
+    // Sign 2
+    s_obj_alr2 = lv_obj_create(s_scr_hud);
+    lv_obj_set_size(s_obj_alr2, 32, 32);
+    lv_obj_set_pos(s_obj_alr2, 280, 85);
+    lv_obj_set_style_radius(s_obj_alr2, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_bg_color(s_obj_alr2, lv_color_hex(0xFFFFFF), 0);
+    lv_obj_set_style_border_color(s_obj_alr2, lv_color_hex(0x00E5FF), 0);
+    lv_obj_set_style_border_width(s_obj_alr2, 2, 0);
+    lv_obj_clear_flag(s_obj_alr2, LV_OBJ_FLAG_SCROLLABLE);
 
-    s_lbl_street = lv_label_create(bar_street);
+    s_lbl_alr2_val = lv_label_create(s_obj_alr2);
+    lv_label_set_text(s_lbl_alr2_val, "60");
+    lv_obj_set_style_text_font(s_lbl_alr2_val, &font_vietnam_16, 0);
+    lv_obj_set_style_text_color(s_lbl_alr2_val, lv_color_hex(0x000000), 0);
+    lv_obj_align(s_lbl_alr2_val, LV_ALIGN_CENTER, 0, 0);
+
+    s_lbl_alr2_dst = lv_label_create(s_scr_hud);
+    lv_label_set_text(s_lbl_alr2_dst, "");
+    lv_obj_set_style_text_font(s_lbl_alr2_dst, &font_vietnam_16, 0);
+    lv_obj_set_style_text_color(s_lbl_alr2_dst, lv_color_hex(0x00E5FF), 0);
+    lv_obj_set_pos(s_lbl_alr2_dst, 275, 120);
+
+    lv_obj_add_flag(s_obj_alr2, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(s_lbl_alr2_dst, LV_OBJ_FLAG_HIDDEN);
+
+    // ==========================================
+    // 5. BOTTOM: Street Name & Navigation Footer
+    // ==========================================
+    s_lbl_street = lv_label_create(s_scr_hud);
     lv_label_set_text(s_lbl_street, "");
-    lv_obj_set_width(s_lbl_street, 305);
+    lv_obj_set_width(s_lbl_street, 310);
     lv_label_set_long_mode(s_lbl_street, LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_obj_set_style_text_font(s_lbl_street, &font_vietnam_24, 0);
-    lv_obj_set_style_text_color(s_lbl_street, lv_color_hex(0xFFFFFF), 0);
-    lv_obj_align(s_lbl_street, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_set_style_text_color(s_lbl_street, lv_color_hex(0xFFD54F), 0); // Amber/Gold text
+    lv_obj_set_pos(s_lbl_street, 8, 160);
+
+    s_lbl_eta_info = lv_label_create(s_scr_hud);
+    lv_label_set_text(s_lbl_eta_info, "");
+    lv_obj_set_width(s_lbl_eta_info, 310);
+    lv_obj_set_style_text_font(s_lbl_eta_info, &font_vietnam_16, 0);
+    lv_obj_set_style_text_color(s_lbl_eta_info, lv_color_hex(0xB0BEC5), 0);
+    lv_obj_set_pos(s_lbl_eta_info, 8, 200);
 }
 
 void HudScreen::init() {
@@ -238,16 +271,16 @@ void HudScreen::setScreenState(ScreenState state) {
 void HudScreen::updateData(const HudState& state) {
     char buf[64];
 
-    // Speed
+    // 1. Current Speed
     snprintf(buf, sizeof(buf), "%d", state.spd);
     lv_label_set_text(s_lbl_speed, buf);
     if (state.over || (state.lim > 0 && state.spd > state.lim)) {
-        lv_obj_set_style_text_color(s_lbl_speed, lv_color_hex(0xFF5252), 0); // Red
+        lv_obj_set_style_text_color(s_lbl_speed, lv_color_hex(0xFF1744), 0); // Vivid Red
     } else {
-        lv_obj_set_style_text_color(s_lbl_speed, lv_color_hex(0xFFFFFF), 0); // White
+        lv_obj_set_style_text_color(s_lbl_speed, lv_color_hex(0xFFFFFF), 0); // Pure White
     }
 
-    // Speed limit
+    // 2. Speed Limit Sign
     if (state.lim > 0) {
         snprintf(buf, sizeof(buf), "%d", state.lim);
         lv_label_set_text(s_lbl_limit, buf);
@@ -256,76 +289,116 @@ void HudScreen::updateData(const HudState& state) {
         lv_obj_add_flag(s_obj_limit_circle, LV_OBJ_FLAG_HIDDEN);
     }
 
-    // Turn arrow & distance
+    // 3. Turn Arrow & Distance (Left)
     if (state.nav && state.trn > 0) {
         lv_label_set_text(s_lbl_turn_icon, get_turn_symbol(state.trn));
         if (state.dst >= 0) {
             if (state.dst >= 1000) {
-                snprintf(buf, sizeof(buf), "%.1f km", state.dst / 1000.0f);
+                snprintf(buf, sizeof(buf), "%.1f KM", state.dst / 1000.0f);
             } else {
-                snprintf(buf, sizeof(buf), "%d m", state.dst);
+                snprintf(buf, sizeof(buf), "%d M", state.dst);
             }
             lv_label_set_text(s_lbl_turn_dst, buf);
         } else {
             lv_label_set_text(s_lbl_turn_dst, "");
         }
-        lv_label_set_text(s_lbl_turn_st2, state.st2);
     } else {
         lv_label_set_text(s_lbl_turn_icon, "");
         lv_label_set_text(s_lbl_turn_dst, "");
-        lv_label_set_text(s_lbl_turn_st2, "");
     }
 
-    // Street name (Vietnamese full Unicode)
-    lv_label_set_text(s_lbl_street, state.st);
-
-    // ETA row & Distance remaining
-    if (state.nav && (strlen(state.eta) > 0 || state.rm > 0 || state.rkm > 0)) {
-        if (strlen(state.eta) > 0) {
-            snprintf(buf, sizeof(buf), "ETA %s", state.eta);
-            lv_label_set_text(s_lbl_eta_row, buf);
-        } else {
-            lv_label_set_text(s_lbl_eta_row, "");
-        }
-
-        if (state.rm > 0) {
-            snprintf(buf, sizeof(buf), "Còn %.1f km", state.rm / 1000.0f);
-            lv_label_set_text(s_lbl_dist_rem, buf);
-        } else if (state.rkm > 0) {
-            snprintf(buf, sizeof(buf), "Còn %.1f km", state.rkm);
-            lv_label_set_text(s_lbl_dist_rem, buf);
-        } else {
-            lv_label_set_text(s_lbl_dist_rem, "");
-        }
-    } else {
-        lv_label_set_text(s_lbl_eta_row, "");
-        lv_label_set_text(s_lbl_dist_rem, "");
-    }
-
-    // Alert Bar
+    // 4. Primary Alert (Top Right)
     if (state.alr > 0) {
+        lv_label_set_text(s_lbl_alert_icon, get_alert_icon_symbol(state.alr));
         if (state.alrD >= 0) {
-            snprintf(buf, sizeof(buf), "⚠  %s  (còn %d m)", get_alert_name_vi(state.alr), state.alrD);
+            if (state.alrD >= 1000) {
+                snprintf(buf, sizeof(buf), "%.1f KM", state.alrD / 1000.0f);
+            } else {
+                snprintf(buf, sizeof(buf), "%d M", state.alrD);
+            }
+            lv_label_set_text(s_lbl_alert_dst, buf);
         } else {
-            snprintf(buf, sizeof(buf), "⚠  %s", get_alert_name_vi(state.alr));
+            lv_label_set_text(s_lbl_alert_dst, "");
         }
-        lv_label_set_text(s_lbl_alert, buf);
-        lv_obj_clear_flag(s_bar_alert, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(s_obj_alert_main, LV_OBJ_FLAG_HIDDEN);
     } else {
-        lv_obj_add_flag(s_bar_alert, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(s_obj_alert_main, LV_OBJ_FLAG_HIDDEN);
     }
 
-    // Average Zone Bar (Vietnam: Cấm Vượt)
-    if (state.avg) {
-        lv_bar_set_value(s_bar_avg, state.avgP, LV_ANIM_OFF);
-        if (state.avgL > 0) {
-            snprintf(buf, sizeof(buf), "%d m", state.avgL);
+    // 5. Upcoming Alert Signs from alrs array (Bottom Right)
+    if (state.alrs_count > 0 && state.alrs[0].v > 0) {
+        snprintf(buf, sizeof(buf), "%d", state.alrs[0].v);
+        lv_label_set_text(s_lbl_alr1_val, buf);
+        if (state.alrs[0].d >= 1000) {
+            snprintf(buf, sizeof(buf), "%.1fK", state.alrs[0].d / 1000.0f);
         } else {
-            snprintf(buf, sizeof(buf), "CẤM VƯỢT");
+            snprintf(buf, sizeof(buf), "%dM", state.alrs[0].d);
         }
-        lv_label_set_text(s_lbl_avg, buf);
-        lv_obj_clear_flag(s_bar_avg, LV_OBJ_FLAG_HIDDEN);
+        lv_label_set_text(s_lbl_alr1_dst, buf);
+        lv_obj_clear_flag(s_obj_alr1, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(s_lbl_alr1_dst, LV_OBJ_FLAG_HIDDEN);
     } else {
-        lv_obj_add_flag(s_bar_avg, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(s_obj_alr1, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(s_lbl_alr1_dst, LV_OBJ_FLAG_HIDDEN);
+    }
+
+    if (state.alrs_count > 1 && state.alrs[1].v > 0) {
+        snprintf(buf, sizeof(buf), "%d", state.alrs[1].v);
+        lv_label_set_text(s_lbl_alr2_val, buf);
+        if (state.alrs[1].d >= 1000) {
+            snprintf(buf, sizeof(buf), "%.1fK", state.alrs[1].d / 1000.0f);
+        } else {
+            snprintf(buf, sizeof(buf), "%dM", state.alrs[1].d);
+        }
+        lv_label_set_text(s_lbl_alr2_dst, buf);
+        lv_obj_clear_flag(s_obj_alr2, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(s_lbl_alr2_dst, LV_OBJ_FLAG_HIDDEN);
+    } else {
+        lv_obj_add_flag(s_obj_alr2, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(s_lbl_alr2_dst, LV_OBJ_FLAG_HIDDEN);
+    }
+
+    // 6. Bottom Street Name & Route Info
+    if (strlen(state.st2) > 0) {
+        snprintf(buf, sizeof(buf), "Rẽ: %s", state.st2);
+        lv_label_set_text(s_lbl_street, buf);
+    } else if (strlen(state.st) > 0) {
+        lv_label_set_text(s_lbl_street, state.st);
+    } else {
+        lv_label_set_text(s_lbl_street, "");
+    }
+
+    // 7. Footer: ETA & Remaining Distance / Cấm Vượt
+    if (state.avg) {
+        if (state.avgL > 0) {
+            snprintf(buf, sizeof(buf), "⛔ ĐOẠN CẤM VƯỢT (còn %d m)", state.avgL);
+        } else {
+            snprintf(buf, sizeof(buf), "⛔ ĐOẠN CẤM VƯỢT");
+        }
+        lv_label_set_text(s_lbl_eta_info, buf);
+        lv_obj_set_style_text_color(s_lbl_eta_info, lv_color_hex(0xFF5722), 0);
+    } else if (state.nav && (strlen(state.eta) > 0 || state.rm > 0 || state.rkm > 0)) {
+        char eta_buf[32] = "";
+        char dist_buf[32] = "";
+        if (strlen(state.eta) > 0) {
+            snprintf(eta_buf, sizeof(eta_buf), "ETA %s", state.eta);
+        }
+        if (state.rm > 0) {
+            snprintf(dist_buf, sizeof(dist_buf), "Còn %.1f km", state.rm / 1000.0f);
+        } else if (state.rkm > 0) {
+            snprintf(dist_buf, sizeof(dist_buf), "Còn %.1f km", state.rkm);
+        }
+
+        if (strlen(eta_buf) > 0 && strlen(dist_buf) > 0) {
+            snprintf(buf, sizeof(buf), "%s  •  %s", eta_buf, dist_buf);
+        } else if (strlen(eta_buf) > 0) {
+            snprintf(buf, sizeof(buf), "%s", eta_buf);
+        } else {
+            snprintf(buf, sizeof(buf), "%s", dist_buf);
+        }
+        lv_label_set_text(s_lbl_eta_info, buf);
+        lv_obj_set_style_text_color(s_lbl_eta_info, lv_color_hex(0xB0BEC5), 0);
+    } else {
+        lv_label_set_text(s_lbl_eta_info, "");
     }
 }
