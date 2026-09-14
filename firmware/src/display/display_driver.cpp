@@ -27,38 +27,28 @@ static void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t
     lv_disp_flush_ready(disp);
 }
 
-// Touch input read callback for XPT2046
+// Touch input read callback for XPT2046 sending points to LVGL
 static void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data) {
     uint16_t touchX = 0, touchY = 0;
-    // Lower threshold to 150 for high touch sensitivity
     bool touched = s_tft.getTouchRaw(&touchX, &touchY);
-
-    static bool s_last_touched = false;
-    static uint32_t s_touch_press_time = 0;
-
-    // PIN_TOUCH_IRQ is active LOW on CYD (GPIO 36)
     bool hw_touched = (digitalRead(PIN_TOUCH_IRQ) == LOW) || touched;
 
     if (hw_touched) {
         data->state = LV_INDEV_STATE_PR;
-        data->point.x = touchX;
-        data->point.y = touchY;
+        
+        // Map raw ADC coordinates (approx 200..3800) to screen pixel coordinates (320x240)
+        // Adjust for Landscape orientation:
+        int32_t px = map(touchX, 300, 3700, 0, SCREEN_WIDTH);
+        int32_t py = map(touchY, 300, 3700, 0, SCREEN_HEIGHT);
+        if (px < 0) px = 0;
+        if (px >= SCREEN_WIDTH) px = SCREEN_WIDTH - 1;
+        if (py < 0) py = 0;
+        if (py >= SCREEN_HEIGHT) py = SCREEN_HEIGHT - 1;
 
-        if (!s_last_touched) {
-            s_touch_press_time = millis();
-        }
-        s_last_touched = true;
+        data->point.x = px;
+        data->point.y = py;
     } else {
         data->state = LV_INDEV_STATE_REL;
-        // Detect tap release (short press between 30ms and 1500ms)
-        if (s_last_touched) {
-            uint32_t press_duration = millis() - s_touch_press_time;
-            if (press_duration >= 30 && press_duration <= 1500) {
-                LOG_I("Screen tap detected! Toggling Mirror HUD mode");
-                DisplayDriver::toggleMirror();
-            }
-        }
-        s_last_touched = false;
     }
 }
 
@@ -70,14 +60,11 @@ void DisplayDriver::setBrightness(uint8_t percent) {
 
 void DisplayDriver::toggleMirror() {
     s_is_mirrored = !s_is_mirrored;
-    // TFT_eSPI Rotations:
-    // 1 = Normal Landscape
-    // 7 = Inverted/Mirrored Landscape (ideal for windshield reflection HUD)
     if (s_is_mirrored) {
-        s_tft.setRotation(7);
+        s_tft.setRotation(7); // Inverted/Mirrored Landscape for windshield reflection
         LOG_I("HUD Mode: Windshield Mirror Reflection (Rotation 7)");
     } else {
-        s_tft.setRotation(1);
+        s_tft.setRotation(1); // Normal Landscape
         LOG_I("HUD Mode: Normal Direct View (Rotation 1)");
     }
 
@@ -130,7 +117,7 @@ bool DisplayDriver::init(SemaphoreHandle_t lvgl_mutex) {
     disp_drv.draw_buf = &s_draw_buf;
     lv_disp_drv_register(&disp_drv);
 
-    // Register touch input driver
+    // Register touch input driver to LVGL indev pointer
     static lv_indev_drv_t indev_drv;
     lv_indev_drv_init(&indev_drv);
     indev_drv.type = LV_INDEV_TYPE_POINTER;

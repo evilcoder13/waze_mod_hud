@@ -2,6 +2,27 @@
 
 Tất cả những thay đổi nổi bật của dự án **WazeHUD CYD** sẽ được lưu lại tại tài liệu này theo quy chuẩn [Semantic Versioning](https://semver.org/).
 
+## [v1.2.0] - 2026-09-14
+
+### ✨ Tính năng mới (Added)
+- **Nút chuyển đổi HUD góc phải trên Top Bar (`[ 🔄 HUD ]`)**:
+  - Tách riêng chức năng lật gương thành nút bấm cảm ứng chuyên dụng trên thanh Alert Bar.
+  - Chống chạm nhầm khi người dùng cầm nắm, lau màn hình hoặc căn chỉnh chân đế.
+  - Tích hợp driver cảm ứng map tọa độ chạm chính xác vào hệ thống Event của LVGL.
+
+### 🎨 Cải tiến giao diện (Changed)
+- **Hàng 1 (Top Bar - 32px)**:
+  - Tự động đổi sang nền đỏ tươi (`#D32F2F`) chữ trắng khi có cảnh báo khẩn cấp: `⚠ CAMERA ĐÈN ĐỎ (cách 100 m)`.
+  - Giữ nền tối mờ tinh tế khi không có cảnh báo (`WazeHUD • Đã kết nối`).
+- **Hàng 2 (Middle Dashboard - 164px) - Bố cục 3 cột cân đối**:
+  - Cột trái: Mũi tên uốn lượn chỉ hướng (rẽ trái, phải, đi thẳng, quay đầu) + cự ly `dst` to rõ màu vàng + tên đường rẽ nhánh `st2`.
+  - Cột giữa: Tốc độ xe màu trắng cực đại (tự chuyển đỏ khi quá tốc độ) + biển tròn báo giới hạn tốc độ viền đỏ nền trắng số đen.
+  - Cột phải: Card cảnh báo chính (Camera / CSGT) nổi bật + 2 vòng tròn hiển thị cảnh báo phụ sắp tới (`alrs`).
+- **Hàng 3 (Footer hành trình - 44px)**:
+  - Tên đường hiện tại chữ trắng nền đen tuyền: `📍 Nguyễn Chí Thanh`.
+  - Giờ đến nơi (ETA) và số km còn lại: `18:04 • Còn 7.0 km`.
+  - Căn lề đẩy lên cao để không bị ngàm kẹp của đế đỡ trên xe che khuất.
+
 ---
 
 ## [v1.1.0] - 2026-09-14
