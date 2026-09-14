@@ -56,9 +56,12 @@ Chân thành cảm ơn đội ngũ phát triển và cộng đồng **Waze Mod V
 ```
 WazeHUD/
 ├── README.md                 ← Tài liệu giới thiệu tổng quan dự án
+├── CHANGELOG.md              ← Nhật ký thay đổi và lịch sử các phiên bản
 ├── GEMINI.md                 ← Bản quy tắc & ràng buộc kiến trúc cho AI Agent
 ├── bin/                      ← Chứa file binary build sẵn nạp ngay
-│   └── wazehud_cyd_factory_all_in_one_0x0.bin  (File Factory nạp tại 0x0)
+│   ├── wazehud_cyd_factory_all_in_one_0x0.bin  (Bản mới nhất)
+│   ├── wazehud_cyd_v1.1.0_factory_0x0.bin      (Bản v1.1.0)
+│   └── wazehud_cyd_v1.0.0_factory_0x0.bin      (Bản v1.0.0)
 ├── docs/                     ← Hệ thống tài liệu chi tiết
 │   ├── ARCHITECTURE.md       ← Kiến trúc FreeRTOS, luồng dữ liệu & bộ nhớ
 │   ├── HARDWARE.md           ← Sơ đồ chân pinout chi tiết ESP32 CYD

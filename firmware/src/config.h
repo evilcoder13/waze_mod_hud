@@ -7,7 +7,7 @@
 // ==========================================
 // Firmware Metadata
 // ==========================================
-constexpr const char* FIRMWARE_VERSION = "1.0.0";
+constexpr const char* FIRMWARE_VERSION = "1.1.0";
 constexpr const char* DEVICE_NAME      = "WazeHUD";
 constexpr const char* HLP_DEVICE_MODEL = "WazeHUD-CYD";
 
