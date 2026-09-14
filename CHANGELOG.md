@@ -2,6 +2,26 @@
 
 Tất cả những thay đổi nổi bật của dự án **WazeHUD CYD** sẽ được lưu lại tại tài liệu này theo quy chuẩn [Semantic Versioning](https://semver.org/).
 
+## [v1.3.0] - 2026-09-14
+
+### 🐛 Sửa lỗi & Hoàn thiện (Fixes & Improvements)
+- **Khắc phục triệt để lỗi ô vuông rỗng `[]`**:
+  - Thay thế toàn bộ ký tự emoji Unicode chưa có trong font bằng nhãn text thuần Việt (`LẬT HUD`, `CAM ĐÈN ĐỎ`, `WazeHUD Connected`).
+- **Sửa icon chỉ hướng quay đầu (U-Turn)**:
+  - Loại bỏ ký hiệu 2 mũi tên xoay tròn `LV_SYMBOL_REFRESH`, thay bằng biểu tượng chữ `U` uốn ngược chuẩn Waze.
+- **Sửa nút cảm ứng LẬT HUD góc trên bên phải**:
+  - Hiệu chỉnh lại ma trận cảm ứng XPT2046 `setTouch({260, 3600, 350, 3450, 1})` cho board CYD 2.8" chiều ngang, bổ sung nhận diện chạm góc trên bên phải (`x >= 230, y <= 45`) đảm bảo bấm là ăn 100%.
+- **Sửa tràn chữ & đè chữ ở hàng cảnh báo và card cảnh báo**:
+  - Hàng trên: Rút gọn text cảnh báo vừa khít không đè nút HUD: `CAM ĐÈN ĐỎ (270 m)`.
+  - Khung cảnh báo bên phải: Bố cục lại thành 2 dòng rõ ràng (Loại cảnh báo màu Cyan ở trên, Khoảng cách mét màu Vàng ở dưới), không còn bị đè chữ.
+- **Tận dụng khoảng trắng giữa màn hình**:
+  - Bổ sung **Đồng hồ thời gian thực** (Giờ hiện tại tính toán tự động từ Waze Telemetry) ngay dưới tốc độ và biển báo 60.
+- **Thiết kế lại Footer chân màn hình (Split Footer)**:
+  - Chia đôi 2 bên: Bên trái là tên đường hiện tại (`Phạm Hùng`), bên phải là thông tin chuyến đi (`21:04 • Còn 13 km`).
+  - Co font nhỏ gọn 16px và nâng cao vị trí, không còn bị ngàm kẹp của đế giữ che mất.
+
+---
+
 ## [v1.2.0] - 2026-09-14
 
 ### ✨ Tính năng mới (Added)

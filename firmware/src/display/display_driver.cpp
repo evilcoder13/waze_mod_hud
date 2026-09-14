@@ -30,25 +30,34 @@ static void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t
 // Touch input read callback for XPT2046 sending points to LVGL
 static void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data) {
     uint16_t touchX = 0, touchY = 0;
-    bool touched = s_tft.getTouchRaw(&touchX, &touchY);
-    bool hw_touched = (digitalRead(PIN_TOUCH_IRQ) == LOW) || touched;
+    // TFT_eSPI handles calibration and rotation internally
+    bool touched = s_tft.getTouch(&touchX, &touchY, 400);
 
-    if (hw_touched) {
+    static bool s_last_touched = false;
+    static uint32_t s_touch_press_time = 0;
+
+    if (touched) {
         data->state = LV_INDEV_STATE_PR;
-        
-        // Map raw ADC coordinates (approx 200..3800) to screen pixel coordinates (320x240)
-        // Adjust for Landscape orientation:
-        int32_t px = map(touchX, 300, 3700, 0, SCREEN_WIDTH);
-        int32_t py = map(touchY, 300, 3700, 0, SCREEN_HEIGHT);
-        if (px < 0) px = 0;
-        if (px >= SCREEN_WIDTH) px = SCREEN_WIDTH - 1;
-        if (py < 0) py = 0;
-        if (py >= SCREEN_HEIGHT) py = SCREEN_HEIGHT - 1;
+        data->point.x = touchX;
+        data->point.y = touchY;
 
-        data->point.x = px;
-        data->point.y = py;
+        if (!s_last_touched) {
+            s_touch_press_time = millis();
+        }
+        s_last_touched = true;
     } else {
         data->state = LV_INDEV_STATE_REL;
+        // Check if user tapped in the top-right corner (HUD button area: x >= 230, y <= 40)
+        if (s_last_touched) {
+            uint32_t press_duration = millis() - s_touch_press_time;
+            if (press_duration >= 40 && press_duration <= 1200) {
+                if (data->point.x >= 230 && data->point.y <= 45) {
+                    LOG_I("Direct top-right corner tap detected! Toggling Mirror HUD mode");
+                    DisplayDriver::toggleMirror();
+                }
+            }
+        }
+        s_last_touched = false;
     }
 }
 
@@ -104,6 +113,10 @@ bool DisplayDriver::init(SemaphoreHandle_t lvgl_mutex) {
     s_tft.init();
     s_tft.setRotation(DISPLAY_ROTATION); // Default: 1 (Landscape)
     s_tft.fillScreen(TFT_BLACK);
+
+    // Touch calibration data for ESP32-2432S028 CYD in landscape
+    uint16_t calData[5] = { 260, 3600, 350, 3450, 1 };
+    s_tft.setTouch(calData);
 
     // 4. LVGL Init
     lv_init();
