@@ -24,7 +24,8 @@ static lv_obj_t* s_lbl_hud_btn = nullptr;
 // ==========================================
 // 2. MIDDLE - LEFT: Turn Indicator
 // ==========================================
-static lv_obj_t* s_lbl_turn_icon = nullptr;
+static lv_obj_t* s_canvas_turn = nullptr;
+static lv_color_t s_turn_cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(64, 64)];
 static lv_obj_t* s_lbl_turn_dst = nullptr;
 static lv_obj_t* s_lbl_turn_st2 = nullptr;
 
@@ -41,6 +42,8 @@ static lv_obj_t* s_lbl_clock = nullptr; // Clock in middle space!
 // 4. MIDDLE - RIGHT: Primary & Secondary Alerts
 // ==========================================
 static lv_obj_t* s_obj_alert_main = nullptr;
+static lv_obj_t* s_canvas_alert = nullptr;
+static lv_color_t s_alert_cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(40, 40)];
 static lv_obj_t* s_lbl_alert_type = nullptr;
 static lv_obj_t* s_lbl_alert_dst = nullptr;
 
@@ -175,17 +178,16 @@ void HudScreen::createHudScreen() {
     // =======================================================
     // 2. MIDDLE - LEFT: Turn Indicator (Width ~95px)
     // =======================================================
-    s_lbl_turn_icon = lv_label_create(s_scr_hud);
-    lv_label_set_text(s_lbl_turn_icon, "");
-    lv_obj_set_style_text_font(s_lbl_turn_icon, &lv_font_montserrat_48, 0);
-    lv_obj_set_style_text_color(s_lbl_turn_icon, lv_color_hex(0xFFFFFF), 0);
-    lv_obj_set_pos(s_lbl_turn_icon, 20, 36);
+    s_canvas_turn = lv_canvas_create(s_scr_hud);
+    lv_canvas_set_buffer(s_canvas_turn, s_turn_cbuf, 64, 64, LV_IMG_CF_TRUE_COLOR);
+    lv_canvas_fill_bg(s_canvas_turn, lv_color_hex(0x000000), LV_OPA_TRANSP);
+    lv_obj_set_pos(s_canvas_turn, 14, 32);
 
     s_lbl_turn_dst = lv_label_create(s_scr_hud);
     lv_label_set_text(s_lbl_turn_dst, "");
     lv_obj_set_style_text_font(s_lbl_turn_dst, &font_vietnam_24, 0);
     lv_obj_set_style_text_color(s_lbl_turn_dst, lv_color_hex(0xFFEB3B), 0); // Yellow
-    lv_obj_set_pos(s_lbl_turn_dst, 8, 92);
+    lv_obj_set_pos(s_lbl_turn_dst, 6, 98);
 
     s_lbl_turn_st2 = lv_label_create(s_scr_hud);
     lv_label_set_text(s_lbl_turn_st2, "");
@@ -193,7 +195,7 @@ void HudScreen::createHudScreen() {
     lv_label_set_long_mode(s_lbl_turn_st2, LV_LABEL_LONG_DOT);
     lv_obj_set_style_text_font(s_lbl_turn_st2, &font_vietnam_16, 0);
     lv_obj_set_style_text_color(s_lbl_turn_st2, lv_color_hex(0xB0BEC5), 0);
-    lv_obj_set_pos(s_lbl_turn_st2, 6, 126);
+    lv_obj_set_pos(s_lbl_turn_st2, 6, 130);
 
     // =======================================================
     // 3. MIDDLE - CENTER: Speed, Speed Limit & Real-time Clock
@@ -237,27 +239,27 @@ void HudScreen::createHudScreen() {
     // =======================================================
     // 4. MIDDLE - RIGHT: Primary Alert & Secondary (alrs)
     // =======================================================
-    // Primary Alert Card (Compact, no text overlapping)
+    // Primary Alert Card (With Camera / Hazard Graphic Canvas)
     s_obj_alert_main = lv_obj_create(s_scr_hud);
-    lv_obj_set_size(s_obj_alert_main, 84, 52);
-    lv_obj_set_pos(s_obj_alert_main, 230, 36);
+    lv_obj_set_size(s_obj_alert_main, 84, 56);
+    lv_obj_set_pos(s_obj_alert_main, 230, 34);
     lv_obj_set_style_radius(s_obj_alert_main, 6, 0);
     lv_obj_set_style_bg_color(s_obj_alert_main, lv_color_hex(0x181824), 0);
     lv_obj_set_style_border_width(s_obj_alert_main, 1, 0);
     lv_obj_set_style_border_color(s_obj_alert_main, lv_color_hex(0x00E5FF), 0);
     lv_obj_clear_flag(s_obj_alert_main, LV_OBJ_FLAG_SCROLLABLE);
 
-    s_lbl_alert_type = lv_label_create(s_obj_alert_main);
-    lv_label_set_text(s_lbl_alert_type, "CAM ĐÈN ĐỎ");
-    lv_obj_set_style_text_font(s_lbl_alert_type, &font_vietnam_16, 0);
-    lv_obj_set_style_text_color(s_lbl_alert_type, lv_color_hex(0x00E5FF), 0);
-    lv_obj_align(s_lbl_alert_type, LV_ALIGN_TOP_MID, 0, -3);
+    // Alert Canvas (40x40 px inside card)
+    s_canvas_alert = lv_canvas_create(s_obj_alert_main);
+    lv_canvas_set_buffer(s_canvas_alert, s_alert_cbuf, 40, 40, LV_IMG_CF_TRUE_COLOR);
+    lv_canvas_fill_bg(s_canvas_alert, lv_color_hex(0x000000), LV_OPA_TRANSP);
+    lv_obj_align(s_canvas_alert, LV_ALIGN_TOP_MID, 0, -6);
 
     s_lbl_alert_dst = lv_label_create(s_obj_alert_main);
     lv_label_set_text(s_lbl_alert_dst, "270 M");
     lv_obj_set_style_text_font(s_lbl_alert_dst, &font_vietnam_16, 0);
     lv_obj_set_style_text_color(s_lbl_alert_dst, lv_color_hex(0xFFEB3B), 0); // Yellow
-    lv_obj_align(s_lbl_alert_dst, LV_ALIGN_BOTTOM_MID, 0, 3);
+    lv_obj_align(s_lbl_alert_dst, LV_ALIGN_BOTTOM_MID, 0, 4);
 
     lv_obj_add_flag(s_obj_alert_main, LV_OBJ_FLAG_HIDDEN);
 
@@ -389,11 +391,21 @@ void HudScreen::updateData(const HudState& state) {
         lv_obj_set_style_text_color(s_lbl_top_alert, lv_color_hex(0x00E5FF), 0);
     }
 
+    if (s_lbl_hud_btn) {
+        lv_label_set_text(s_lbl_hud_btn, DisplayDriver::isMirrored() ? "HUD" : "LẬT");
+    }
+
     // ==========================================
     // 2. TURN DIRECTION (Left Column)
     // ==========================================
+    static int s_last_drawn_trn = -1;
     if (state.nav && state.trn > 0) {
-        lv_label_set_text(s_lbl_turn_icon, get_turn_symbol(state.trn));
+        if (s_last_drawn_trn != state.trn) {
+            draw_turn_arrow_canvas(s_canvas_turn, state.trn, lv_color_hex(0x00E5FF)); // Cyan Waze arrow
+            s_last_drawn_trn = state.trn;
+        }
+        lv_obj_clear_flag(s_canvas_turn, LV_OBJ_FLAG_HIDDEN);
+
         if (state.dst >= 0) {
             if (state.dst >= 1000) {
                 snprintf(buf, sizeof(buf), "%.1f KM", state.dst / 1000.0f);
@@ -411,7 +423,9 @@ void HudScreen::updateData(const HudState& state) {
             lv_label_set_text(s_lbl_turn_st2, "");
         }
     } else {
-        lv_label_set_text(s_lbl_turn_icon, "");
+        s_last_drawn_trn = -1;
+        lv_canvas_fill_bg(s_canvas_turn, lv_color_hex(0x000000), LV_OPA_TRANSP);
+        lv_obj_add_flag(s_canvas_turn, LV_OBJ_FLAG_HIDDEN);
         lv_label_set_text(s_lbl_turn_dst, "");
         lv_label_set_text(s_lbl_turn_st2, "");
     }
@@ -451,10 +465,15 @@ void HudScreen::updateData(const HudState& state) {
     }
 
     // ==========================================
-    // 4. ALERTS (Right Column)
+    // 4. ALERTS (Right Column - Graphic Icon Canvas)
     // ==========================================
+    static int s_last_drawn_alr = -1;
     if (state.alr > 0) {
-        lv_label_set_text(s_lbl_alert_type, get_alert_name_vi(state.alr));
+        if (s_last_drawn_alr != state.alr) {
+            draw_alert_icon_canvas(s_canvas_alert, state.alr);
+            s_last_drawn_alr = state.alr;
+        }
+
         if (state.alrD >= 0) {
             if (state.alrD >= 1000) {
                 snprintf(buf, sizeof(buf), "%.1f KM", state.alrD / 1000.0f);
@@ -467,6 +486,7 @@ void HudScreen::updateData(const HudState& state) {
         }
         lv_obj_clear_flag(s_obj_alert_main, LV_OBJ_FLAG_HIDDEN);
     } else {
+        s_last_drawn_alr = -1;
         lv_obj_add_flag(s_obj_alert_main, LV_OBJ_FLAG_HIDDEN);
     }
 

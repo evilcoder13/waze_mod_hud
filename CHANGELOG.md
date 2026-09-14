@@ -2,6 +2,21 @@
 
 Tất cả những thay đổi nổi bật của dự án **WazeHUD CYD** sẽ được lưu lại tại tài liệu này theo quy chuẩn [Semantic Versioning](https://semver.org/).
 
+## [v1.3.1] - 2026-09-15
+
+### 🚀 Bê nguyên giao diện & cơ chế HUD từ bản tham khảo
+- **Bộ mũi tên chỉ hướng Vector Waze (Thân dày, bo cong chuẩn)**:
+  - Loại bỏ hoàn toàn các ký tự text thô `<, >, U`.
+  - Triển khai bộ vẽ vector động bằng LVGL Canvas: Mũi tên đi thẳng nhọn dày, rẽ trái/phải uốn vuông góc 90°, rẽ chếch 45°, **quay đầu U-Turn chuẩn chữ U ngược có mũi tên chỉ xuống**, vòng xuyến bùng binh bo cong chuẩn.
+- **Biểu tượng đồ họa Cảnh báo & Camera (Alert Canvas Graphic)**:
+  - Vẽ trực tiếp hình ảnh Camera giao thông (Cyan Box + Lens tròn) kết hợp trụ đèn tín hiệu giao thông (Đỏ - Vàng - Xanh) cho Camera phạt nguội/đèn đỏ.
+  - Biển tam giác vàng cảnh báo nguy hiểm/tai nạn, biển đỏ xe ô tô kẹt xe, biển tròn cấm vượt 2 xe.
+- **Khắc phục triệt để cơ chế Lật màn hình HUD (Hardware + Touch)**:
+  - **Nút bấm vật lý (Hardware BOOT button - GPIO 0)**: Bấm trực tiếp nút BOOT trên bo mạch CYD để chuyển đổi qua lại giữa màn hình thường và màn hình hắt kính (Windshield Mirror HUD) tức thì mà không cần chạm màn hình (học hỏi từ firmware mẫu).
+  - **Cảm ứng thông minh**: Hỗ trợ chạm vào bất kỳ vị trí nào trên thanh tiêu đề trên cùng để lật màn hình, không bị trượt khi thao tác lái xe.
+
+---
+
 ## [v1.3.0] - 2026-09-14
 
 ### 🐛 Sửa lỗi & Hoàn thiện (Fixes & Improvements)

@@ -47,12 +47,13 @@ static void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data
         s_last_touched = true;
     } else {
         data->state = LV_INDEV_STATE_REL;
-        // Check if user tapped in the top-right corner (HUD button area: x >= 230, y <= 40)
+        // If user tapped anywhere on screen, allow toggling mirror if desired
         if (s_last_touched) {
             uint32_t press_duration = millis() - s_touch_press_time;
             if (press_duration >= 40 && press_duration <= 1200) {
-                if (data->point.x >= 230 && data->point.y <= 45) {
-                    LOG_I("Direct top-right corner tap detected! Toggling Mirror HUD mode");
+                // Check if user tapped in top-right or anywhere on the top bar
+                if (data->point.y <= 45 || data->point.x >= 220) {
+                    LOG_I("Screen tap detected on HUD toggle area! Toggling Mirror HUD mode");
                     DisplayDriver::toggleMirror();
                 }
             }
@@ -89,7 +90,25 @@ bool DisplayDriver::isMirrored() {
 
 static void renderTask(void* param) {
     LOG_I("renderTask started on Core %d", xPortGetCoreID());
+
+    // Hardware BOOT button setup (GPIO 0, active LOW with internal pull-up)
+    pinMode(PIN_BUTTON_BOOT, INPUT_PULLUP);
+    bool last_btn_state = HIGH;
+    uint32_t last_btn_press_time = 0;
+
     while (true) {
+        // Poll physical BOOT button for instant HUD mirror toggle
+        bool btn_state = digitalRead(PIN_BUTTON_BOOT);
+        if (btn_state == LOW && last_btn_state == HIGH) {
+            uint32_t now = millis();
+            if (now - last_btn_press_time > 300) { // Debounce 300ms
+                LOG_I("Hardware BOOT button pressed! Toggling HUD mirror mode");
+                DisplayDriver::toggleMirror();
+                last_btn_press_time = now;
+            }
+        }
+        last_btn_state = btn_state;
+
         if (s_lvgl_mutex && xSemaphoreTake(s_lvgl_mutex, pdMS_TO_TICKS(20)) == pdTRUE) {
             lv_timer_handler();
             xSemaphoreGive(s_lvgl_mutex);

@@ -7,7 +7,7 @@
 // ==========================================
 // Firmware Metadata
 // ==========================================
-constexpr const char* FIRMWARE_VERSION = "1.3.0";
+constexpr const char* FIRMWARE_VERSION = "1.3.1";
 constexpr const char* DEVICE_NAME      = "WazeHUD";
 constexpr const char* HLP_DEVICE_MODEL = "WazeHUD-CYD";
 
@@ -26,6 +26,9 @@ constexpr int PIN_TFT_BL   = 21; // Backlight PWM (active HIGH)
 // Touch XPT2046 SPI
 constexpr int PIN_TOUCH_CS  = 33;
 constexpr int PIN_TOUCH_IRQ = 36;
+
+// Physical Button (BOOT button on ESP32 CYD - GPIO 0)
+constexpr int PIN_BUTTON_BOOT = 0;
 
 // RGB LED Onboard (Active LOW)
 constexpr int PIN_LED_RED   = 4;
