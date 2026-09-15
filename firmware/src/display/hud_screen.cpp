@@ -25,7 +25,7 @@ static lv_obj_t* s_lbl_hud_btn = nullptr;
 // 2. MIDDLE - LEFT: Turn Indicator
 // ==========================================
 static lv_obj_t* s_canvas_turn = nullptr;
-static lv_color_t s_turn_cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(64, 64)];
+static lv_color_t s_turn_cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(48, 48)];
 static lv_obj_t* s_lbl_turn_dst = nullptr;
 static lv_obj_t* s_lbl_turn_st2 = nullptr;
 
@@ -43,7 +43,7 @@ static lv_obj_t* s_lbl_clock = nullptr; // Clock in middle space!
 // ==========================================
 static lv_obj_t* s_obj_alert_main = nullptr;
 static lv_obj_t* s_canvas_alert = nullptr;
-static lv_color_t s_alert_cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(40, 40)];
+static lv_color_t s_alert_cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(36, 36)];
 static lv_obj_t* s_lbl_alert_type = nullptr;
 static lv_obj_t* s_lbl_alert_dst = nullptr;
 
@@ -179,15 +179,15 @@ void HudScreen::createHudScreen() {
     // 2. MIDDLE - LEFT: Turn Indicator (Width ~95px)
     // =======================================================
     s_canvas_turn = lv_canvas_create(s_scr_hud);
-    lv_canvas_set_buffer(s_canvas_turn, s_turn_cbuf, 64, 64, LV_IMG_CF_TRUE_COLOR);
+    lv_canvas_set_buffer(s_canvas_turn, s_turn_cbuf, 48, 48, LV_IMG_CF_TRUE_COLOR);
     lv_canvas_fill_bg(s_canvas_turn, lv_color_hex(0x000000), LV_OPA_TRANSP);
-    lv_obj_set_pos(s_canvas_turn, 14, 32);
+    lv_obj_set_pos(s_canvas_turn, 22, 38);
 
     s_lbl_turn_dst = lv_label_create(s_scr_hud);
     lv_label_set_text(s_lbl_turn_dst, "");
     lv_obj_set_style_text_font(s_lbl_turn_dst, &font_vietnam_24, 0);
     lv_obj_set_style_text_color(s_lbl_turn_dst, lv_color_hex(0xFFEB3B), 0); // Yellow
-    lv_obj_set_pos(s_lbl_turn_dst, 6, 98);
+    lv_obj_set_pos(s_lbl_turn_dst, 6, 94);
 
     s_lbl_turn_st2 = lv_label_create(s_scr_hud);
     lv_label_set_text(s_lbl_turn_st2, "");
@@ -195,7 +195,7 @@ void HudScreen::createHudScreen() {
     lv_label_set_long_mode(s_lbl_turn_st2, LV_LABEL_LONG_DOT);
     lv_obj_set_style_text_font(s_lbl_turn_st2, &font_vietnam_16, 0);
     lv_obj_set_style_text_color(s_lbl_turn_st2, lv_color_hex(0xB0BEC5), 0);
-    lv_obj_set_pos(s_lbl_turn_st2, 6, 130);
+    lv_obj_set_pos(s_lbl_turn_st2, 6, 126);
 
     // =======================================================
     // 3. MIDDLE - CENTER: Speed, Speed Limit & Real-time Clock
@@ -249,11 +249,11 @@ void HudScreen::createHudScreen() {
     lv_obj_set_style_border_color(s_obj_alert_main, lv_color_hex(0x00E5FF), 0);
     lv_obj_clear_flag(s_obj_alert_main, LV_OBJ_FLAG_SCROLLABLE);
 
-    // Alert Canvas (40x40 px inside card)
+    // Alert Canvas (36x36 px inside card)
     s_canvas_alert = lv_canvas_create(s_obj_alert_main);
-    lv_canvas_set_buffer(s_canvas_alert, s_alert_cbuf, 40, 40, LV_IMG_CF_TRUE_COLOR);
+    lv_canvas_set_buffer(s_canvas_alert, s_alert_cbuf, 36, 36, LV_IMG_CF_TRUE_COLOR);
     lv_canvas_fill_bg(s_canvas_alert, lv_color_hex(0x000000), LV_OPA_TRANSP);
-    lv_obj_align(s_canvas_alert, LV_ALIGN_TOP_MID, 0, -6);
+    lv_obj_align(s_canvas_alert, LV_ALIGN_TOP_MID, 0, -4);
 
     s_lbl_alert_dst = lv_label_create(s_obj_alert_main);
     lv_label_set_text(s_lbl_alert_dst, "270 M");

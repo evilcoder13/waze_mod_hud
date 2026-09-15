@@ -9,8 +9,8 @@
 static TFT_eSPI s_tft = TFT_eSPI();
 static SemaphoreHandle_t s_lvgl_mutex = nullptr;
 static lv_disp_draw_buf_t s_draw_buf;
-static lv_color_t s_buf1[SCREEN_WIDTH * 20];
-static lv_color_t s_buf2[SCREEN_WIDTH * 20];
+static lv_color_t s_buf1[SCREEN_WIDTH * 10];
+static lv_color_t s_buf2[SCREEN_WIDTH * 10];
 
 // Mirror HUD state: 0 = Normal Landscape (Rotation 1), 1 = Mirrored HUD (Rotation 7)
 static bool s_is_mirrored = false;
@@ -139,7 +139,7 @@ bool DisplayDriver::init(SemaphoreHandle_t lvgl_mutex) {
 
     // 4. LVGL Init
     lv_init();
-    lv_disp_draw_buf_init(&s_draw_buf, s_buf1, s_buf2, SCREEN_WIDTH * 20);
+    lv_disp_draw_buf_init(&s_draw_buf, s_buf1, s_buf2, SCREEN_WIDTH * 10);
 
     static lv_disp_drv_t disp_drv;
     lv_disp_drv_init(&disp_drv);

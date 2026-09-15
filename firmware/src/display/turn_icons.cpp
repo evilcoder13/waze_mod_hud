@@ -33,7 +33,7 @@ void draw_turn_arrow_canvas(lv_obj_t* canvas, int trn_code, lv_color_t color) {
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     line_dsc.color = color;
-    line_dsc.width = 7;
+    line_dsc.width = 6;
     line_dsc.round_start = 1;
     line_dsc.round_end = 1;
 
@@ -46,27 +46,27 @@ void draw_turn_arrow_canvas(lv_obj_t* canvas, int trn_code, lv_color_t color) {
     switch (trn_code) {
         case 1:
         case 19: {
-            lv_point_t p[2] = { {32, 54}, {32, 22} };
+            lv_point_t p[2] = { {24, 42}, {24, 18} };
             lv_canvas_draw_line(canvas, p, 2, &line_dsc);
-            lv_point_t head[3] = { {18, 26}, {32, 8}, {46, 26} };
+            lv_point_t head[3] = { {13, 21}, {24, 6}, {35, 21} };
             lv_canvas_draw_polygon(canvas, head, 3, &tri_dsc);
             break;
         }
 
         case 2:
         case 6: {
-            lv_point_t p[3] = { {44, 54}, {44, 30}, {22, 30} };
+            lv_point_t p[3] = { {34, 42}, {34, 24}, {17, 24} };
             lv_canvas_draw_line(canvas, p, 3, &line_dsc);
-            lv_point_t head[3] = { {26, 18}, {8, 30}, {26, 42} };
+            lv_point_t head[3] = { {20, 14}, {6, 24}, {20, 34} };
             lv_canvas_draw_polygon(canvas, head, 3, &tri_dsc);
             break;
         }
 
         case 3:
         case 7: {
-            lv_point_t p[3] = { {20, 54}, {20, 30}, {42, 30} };
+            lv_point_t p[3] = { {14, 42}, {14, 24}, {31, 24} };
             lv_canvas_draw_line(canvas, p, 3, &line_dsc);
-            lv_point_t head[3] = { {38, 18}, {56, 30}, {38, 42} };
+            lv_point_t head[3] = { {28, 14}, {42, 24}, {28, 34} };
             lv_canvas_draw_polygon(canvas, head, 3, &tri_dsc);
             break;
         }
@@ -74,9 +74,9 @@ void draw_turn_arrow_canvas(lv_obj_t* canvas, int trn_code, lv_color_t color) {
         case 4:
         case 13:
         case 15: {
-            lv_point_t p[3] = { {38, 54}, {38, 36}, {22, 20} };
+            lv_point_t p[3] = { {30, 42}, {30, 28}, {16, 16} };
             lv_canvas_draw_line(canvas, p, 3, &line_dsc);
-            lv_point_t head[3] = { {30, 10}, {10, 12}, {18, 32} };
+            lv_point_t head[3] = { {24, 8}, {8, 10}, {14, 26} };
             lv_canvas_draw_polygon(canvas, head, 3, &tri_dsc);
             break;
         }
@@ -84,9 +84,9 @@ void draw_turn_arrow_canvas(lv_obj_t* canvas, int trn_code, lv_color_t color) {
         case 5:
         case 14:
         case 16: {
-            lv_point_t p[3] = { {26, 54}, {26, 36}, {42, 20} };
+            lv_point_t p[3] = { {18, 42}, {18, 28}, {32, 16} };
             lv_canvas_draw_line(canvas, p, 3, &line_dsc);
-            lv_point_t head[3] = { {34, 10}, {54, 12}, {46, 32} };
+            lv_point_t head[3] = { {24, 8}, {40, 10}, {34, 26} };
             lv_canvas_draw_polygon(canvas, head, 3, &tri_dsc);
             break;
         }
@@ -94,9 +94,9 @@ void draw_turn_arrow_canvas(lv_obj_t* canvas, int trn_code, lv_color_t color) {
         case 8:
         case 9:
         case 20: {
-            lv_point_t p[5] = { {44, 54}, {44, 24}, {38, 12}, {24, 12}, {18, 34} };
+            lv_point_t p[5] = { {34, 42}, {34, 18}, {30, 9}, {18, 9}, {14, 26} };
             lv_canvas_draw_line(canvas, p, 5, &line_dsc);
-            lv_point_t head[3] = { {8, 30}, {18, 50}, {28, 30} };
+            lv_point_t head[3] = { {6, 23}, {14, 39}, {22, 23} };
             lv_canvas_draw_polygon(canvas, head, 3, &tri_dsc);
             break;
         }
@@ -107,18 +107,18 @@ void draw_turn_arrow_canvas(lv_obj_t* canvas, int trn_code, lv_color_t color) {
             lv_draw_arc_dsc_t arc_dsc;
             lv_draw_arc_dsc_init(&arc_dsc);
             arc_dsc.color = color;
-            arc_dsc.width = 6;
-            lv_canvas_draw_arc(canvas, 32, 34, 18, 45, 330, &arc_dsc);
+            arc_dsc.width = 5;
+            lv_canvas_draw_arc(canvas, 24, 26, 14, 45, 330, &arc_dsc);
 
-            lv_point_t head[3] = { {44, 16}, {54, 30}, {38, 28} };
+            lv_point_t head[3] = { {33, 12}, {41, 23}, {29, 21} };
             lv_canvas_draw_polygon(canvas, head, 3, &tri_dsc);
             break;
         }
 
         case 17: {
-            lv_point_t pole[2] = { {20, 54}, {20, 12} };
+            lv_point_t pole[2] = { {16, 42}, {16, 9} };
             lv_canvas_draw_line(canvas, pole, 2, &line_dsc);
-            lv_point_t flag[3] = { {20, 12}, {48, 24}, {20, 36} };
+            lv_point_t flag[3] = { {16, 9}, {38, 19}, {16, 29} };
             lv_canvas_draw_polygon(canvas, flag, 3, &tri_dsc);
             break;
         }
