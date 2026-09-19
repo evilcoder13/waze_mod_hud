@@ -222,6 +222,7 @@ void HudScreen::createHudScreen() {
     lv_obj_set_style_bg_color(s_obj_limit_circle, lv_color_hex(0xFFFFFF), 0);
     lv_obj_set_style_border_color(s_obj_limit_circle, lv_color_hex(0xE53935), 0);
     lv_obj_set_style_border_width(s_obj_limit_circle, 5, 0);
+    lv_obj_set_style_pad_all(s_obj_limit_circle, 0, 0);
     lv_obj_clear_flag(s_obj_limit_circle, LV_OBJ_FLAG_SCROLLABLE);
 
     s_lbl_limit = lv_label_create(s_obj_limit_circle);
@@ -229,7 +230,7 @@ void HudScreen::createHudScreen() {
     lv_obj_set_style_text_font(s_lbl_limit, &font_vietnam_24, 0);
     lv_obj_set_style_text_color(s_lbl_limit, lv_color_hex(0x000000), 0);
     lv_obj_align(s_lbl_limit, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_add_flag(s_obj_limit_circle, LV_OBJ_FLAG_HIDDEN);
+    // Speed limit sign is always visible (never hidden by default)
 
     // Clock in Middle White Space (Shows current time e.g., "20:45")
     s_lbl_clock = lv_label_create(s_scr_hud);
@@ -445,13 +446,21 @@ void HudScreen::updateData(const HudState& state) {
         lv_obj_set_style_text_color(s_lbl_speed, lv_color_hex(0xFFFFFF), 0); // White
     }
 
+    static int s_last_valid_limit = 60;
     if (state.lim > 0) {
+        s_last_valid_limit = state.lim;
         snprintf(buf, sizeof(buf), "%d", state.lim);
         lv_label_set_text(s_lbl_limit, buf);
-        lv_obj_clear_flag(s_obj_limit_circle, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_align(s_lbl_limit, LV_ALIGN_CENTER, 0, 0);
+    } else if (s_last_valid_limit > 0) {
+        snprintf(buf, sizeof(buf), "%d", s_last_valid_limit);
+        lv_label_set_text(s_lbl_limit, buf);
+        lv_obj_align(s_lbl_limit, LV_ALIGN_CENTER, 0, 0);
     } else {
-        lv_obj_add_flag(s_obj_limit_circle, LV_OBJ_FLAG_HIDDEN);
+        lv_label_set_text(s_lbl_limit, "60");
+        lv_obj_align(s_lbl_limit, LV_ALIGN_CENTER, 0, 0);
     }
+    lv_obj_clear_flag(s_obj_limit_circle, LV_OBJ_FLAG_HIDDEN);
 
     // Clock calculation (from ETA time or uptime)
     if (strlen(state.eta) > 0 && state.rmin > 0) {
