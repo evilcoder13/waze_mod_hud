@@ -141,101 +141,101 @@ void draw_alert_icon_canvas(lv_obj_t* canvas, int alr_code) {
     if (alr_code == 1) { // Police
         r_dsc.bg_color = lv_color_hex(0x1976D2);
         r_dsc.bg_opa = LV_OPA_COVER;
-        r_dsc.radius = 4;
-        lv_canvas_draw_rect(canvas, 3, 3, 20, 20, &r_dsc);
+        r_dsc.radius = 6;
+        lv_canvas_draw_rect(canvas, 4, 4, 30, 30, &r_dsc);
 
         r_dsc.bg_color = lv_color_hex(0xFFFFFF);
-        r_dsc.radius = 2;
-        lv_canvas_draw_rect(canvas, 6, 10, 14, 5, &r_dsc);
+        r_dsc.radius = 3;
+        lv_canvas_draw_rect(canvas, 9, 15, 20, 7, &r_dsc);
     }
     else if (alr_code == 2 || alr_code == 3) { // Red light / Camera
         // Camera body (Cyan)
         r_dsc.bg_color = lv_color_hex(0x00E5FF);
         r_dsc.bg_opa = LV_OPA_COVER;
-        r_dsc.radius = 3;
-        lv_canvas_draw_rect(canvas, 2, 6, 15, 15, &r_dsc);
+        r_dsc.radius = 4;
+        lv_canvas_draw_rect(canvas, 3, 8, 22, 22, &r_dsc);
 
         // Flash notch
         r_dsc.bg_color = lv_color_hex(0x00B0FF);
         r_dsc.radius = 1;
-        lv_canvas_draw_rect(canvas, 4, 3, 5, 3, &r_dsc);
+        lv_canvas_draw_rect(canvas, 6, 4, 7, 4, &r_dsc);
 
         // Lens
         r_dsc.bg_color = lv_color_hex(0x111118);
         r_dsc.radius = LV_RADIUS_CIRCLE;
-        lv_canvas_draw_rect(canvas, 6, 10, 7, 7, &r_dsc);
+        lv_canvas_draw_rect(canvas, 9, 14, 10, 10, &r_dsc);
 
-        // Traffic light pole
+        // Traffic light pole (right)
         r_dsc.bg_color = lv_color_hex(0x212121);
-        r_dsc.radius = 2;
-        lv_canvas_draw_rect(canvas, 19, 3, 5, 18, &r_dsc);
+        r_dsc.radius = 3;
+        lv_canvas_draw_rect(canvas, 28, 4, 7, 28, &r_dsc);
 
         // Red light on top
         r_dsc.bg_color = lv_color_hex(0xFF1744);
         r_dsc.radius = LV_RADIUS_CIRCLE;
-        lv_canvas_draw_rect(canvas, 20, 4, 3, 3, &r_dsc);
+        lv_canvas_draw_rect(canvas, 29, 5, 5, 5, &r_dsc);
 
         // Yellow light
         r_dsc.bg_color = (alr_code == 3) ? lv_color_hex(0x424242) : lv_color_hex(0xFFEA00);
-        lv_canvas_draw_rect(canvas, 20, 9, 3, 3, &r_dsc);
+        lv_canvas_draw_rect(canvas, 29, 13, 5, 5, &r_dsc);
 
         // Green light
         r_dsc.bg_color = lv_color_hex(0x00E676);
-        lv_canvas_draw_rect(canvas, 20, 14, 3, 3, &r_dsc);
+        lv_canvas_draw_rect(canvas, 29, 21, 5, 5, &r_dsc);
     }
     else if (alr_code == 4 || alr_code == 5 || alr_code == 18) { // Hazard / Accident
         r_dsc.bg_color = lv_color_hex(0xFF9100);
         r_dsc.bg_opa = LV_OPA_COVER;
-        lv_point_t tri[3] = { {13, 2}, {2, 23}, {24, 23} };
+        lv_point_t tri[3] = { {19, 3}, {3, 34}, {35, 34} };
         lv_canvas_draw_polygon(canvas, tri, 3, &r_dsc);
 
         l_dsc.color = lv_color_hex(0x000000);
-        l_dsc.width = 2;
+        l_dsc.width = 3;
         l_dsc.round_start = 1;
         l_dsc.round_end = 1;
-        lv_point_t ex1[2] = { {13, 8}, {13, 15} };
+        lv_point_t ex1[2] = { {19, 12}, {19, 22} };
         lv_canvas_draw_line(canvas, ex1, 2, &l_dsc);
 
         r_dsc.bg_color = lv_color_hex(0x000000);
         r_dsc.radius = LV_RADIUS_CIRCLE;
-        lv_canvas_draw_rect(canvas, 12, 18, 2, 2, &r_dsc);
+        lv_canvas_draw_rect(canvas, 18, 26, 3, 3, &r_dsc);
     }
     else if (alr_code == 6) { // Traffic Jam
         r_dsc.bg_color = lv_color_hex(0xD50000);
-        r_dsc.radius = 3;
-        lv_canvas_draw_rect(canvas, 3, 7, 20, 12, &r_dsc);
+        r_dsc.radius = 4;
+        lv_canvas_draw_rect(canvas, 4, 10, 30, 18, &r_dsc);
 
         r_dsc.bg_color = lv_color_hex(0xFFEB3B);
         r_dsc.radius = 1;
-        lv_canvas_draw_rect(canvas, 5, 13, 4, 3, &r_dsc);
-        lv_canvas_draw_rect(canvas, 15, 13, 4, 3, &r_dsc);
+        lv_canvas_draw_rect(canvas, 7, 20, 5, 4, &r_dsc);
+        lv_canvas_draw_rect(canvas, 26, 20, 5, 4, &r_dsc);
     }
     else if (alr_code == 9 || alr_code == 21) { // Speed Cam
         r_dsc.bg_color = lv_color_hex(0xFFFFFF);
         r_dsc.border_color = lv_color_hex(0xD50000);
-        r_dsc.border_width = 2;
+        r_dsc.border_width = 3;
         r_dsc.radius = LV_RADIUS_CIRCLE;
-        lv_canvas_draw_rect(canvas, 2, 2, 22, 22, &r_dsc);
+        lv_canvas_draw_rect(canvas, 3, 3, 32, 32, &r_dsc);
 
         r_dsc.border_width = 0;
         r_dsc.radius = 1;
         r_dsc.bg_color = lv_color_hex(0xD50000);
-        lv_canvas_draw_rect(canvas, 6, 8, 6, 8, &r_dsc);
+        lv_canvas_draw_rect(canvas, 9, 12, 9, 12, &r_dsc);
         r_dsc.bg_color = lv_color_hex(0x000000);
-        lv_canvas_draw_rect(canvas, 14, 8, 6, 8, &r_dsc);
+        lv_canvas_draw_rect(canvas, 20, 12, 9, 12, &r_dsc);
     }
     else { // Generic warning
         r_dsc.bg_color = lv_color_hex(0xFF9100);
         r_dsc.radius = LV_RADIUS_CIRCLE;
-        lv_canvas_draw_rect(canvas, 3, 3, 20, 20, &r_dsc);
+        lv_canvas_draw_rect(canvas, 4, 4, 30, 30, &r_dsc);
 
         l_dsc.color = lv_color_hex(0xFFFFFF);
-        l_dsc.width = 2;
-        lv_point_t ex[2] = { {13, 6}, {13, 13} };
+        l_dsc.width = 3;
+        lv_point_t ex[2] = { {19, 9}, {19, 20} };
         lv_canvas_draw_line(canvas, ex, 2, &l_dsc);
 
         r_dsc.bg_color = lv_color_hex(0xFFFFFF);
-        lv_canvas_draw_rect(canvas, 12, 16, 2, 2, &r_dsc);
+        lv_canvas_draw_rect(canvas, 18, 24, 3, 3, &r_dsc);
     }
 }
 

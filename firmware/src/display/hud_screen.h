@@ -15,6 +15,7 @@ public:
     static void init();
     static void setScreenState(ScreenState state);
     static void updateData(const HudState& state);
+    static void updateMirrorButton(bool isMirrored);
 
 private:
     static void createBootScreen();

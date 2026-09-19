@@ -70,15 +70,22 @@ void DisplayDriver::setBrightness(uint8_t percent) {
 
 void DisplayDriver::toggleMirror() {
     s_is_mirrored = !s_is_mirrored;
+    s_tft.startWrite();
+    s_tft.writecommand(TFT_MADCTL);
     if (s_is_mirrored) {
-        s_tft.setRotation(5); // Horizontal Mirror Flip (FLIP NGANG) for windshield reflection
-        LOG_I("HUD Mode: Windshield Mirror Reflection (Rotation 5 - Flip Ngang)");
+        // Horizontal Mirror Flip (FLIP NGANG) for windshield reflection:
+        // MX=1, MY=1, MV=1 (0xE8) -> Inverts left/right so mirror reflections read correctly
+        s_tft.writedata(TFT_MAD_MX | TFT_MAD_MY | TFT_MAD_MV | TFT_MAD_COLOR_ORDER);
+        LOG_I("HUD Mode: Windshield Mirror Reflection (Horizontal Flip MADCTL 0xE8)");
     } else {
-        s_tft.setRotation(1); // Normal Landscape
-        LOG_I("HUD Mode: Normal Direct View (Rotation 1)");
+        // Normal Landscape Direct View: MX=1, MY=0, MV=1 (0x68)
+        s_tft.writedata(TFT_MAD_MX | TFT_MAD_MV | TFT_MAD_COLOR_ORDER);
+        LOG_I("HUD Mode: Normal Direct View (Landscape MADCTL 0x68)");
     }
+    s_tft.endWrite();
 
     if (s_lvgl_mutex && xSemaphoreTake(s_lvgl_mutex, pdMS_TO_TICKS(50)) == pdTRUE) {
+        HudScreen::updateMirrorButton(s_is_mirrored);
         lv_obj_invalidate(lv_scr_act());
         xSemaphoreGive(s_lvgl_mutex);
     }

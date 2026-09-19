@@ -43,7 +43,7 @@ static lv_obj_t* s_lbl_clock = nullptr; // Clock in middle space!
 // ==========================================
 static lv_obj_t* s_obj_alert_main = nullptr;
 static lv_obj_t* s_canvas_alert = nullptr;
-static lv_color_t s_alert_cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(26, 26)];
+static lv_color_t s_alert_cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(38, 38)];
 static lv_obj_t* s_lbl_alert_dst = nullptr;
 
 static lv_obj_t* s_obj_sub_alr1 = nullptr;
@@ -67,12 +67,15 @@ static void hud_toggle_event_cb(lv_event_t* e) {
     if (code == LV_EVENT_CLICKED) {
         LOG_I("HUD toggle button clicked!");
         DisplayDriver::toggleMirror();
-        if (s_lbl_hud_btn) {
-            if (DisplayDriver::isMirrored()) {
-                lv_label_set_text(s_lbl_hud_btn, "HUD");
-            } else {
-                lv_label_set_text(s_lbl_hud_btn, "LẬT");
-            }
+    }
+}
+
+void HudScreen::updateMirrorButton(bool isMirrored) {
+    if (s_lbl_hud_btn) {
+        if (isMirrored) {
+            lv_label_set_text(s_lbl_hud_btn, "HUD");
+        } else {
+            lv_label_set_text(s_lbl_hud_btn, "LẬT");
         }
     }
 }
@@ -249,13 +252,13 @@ void HudScreen::createHudScreen() {
     lv_obj_set_style_pad_all(s_obj_alert_main, 0, 0);
     lv_obj_clear_flag(s_obj_alert_main, LV_OBJ_FLAG_SCROLLABLE);
 
-    // Alert Canvas (26x26 px centered horizontally at top)
+    // Alert Canvas (38x38 px centered horizontally at top)
     s_canvas_alert = lv_canvas_create(s_obj_alert_main);
-    lv_canvas_set_buffer(s_canvas_alert, s_alert_cbuf, 26, 26, LV_IMG_CF_TRUE_COLOR);
+    lv_canvas_set_buffer(s_canvas_alert, s_alert_cbuf, 38, 38, LV_IMG_CF_TRUE_COLOR);
     lv_canvas_fill_bg(s_canvas_alert, lv_color_hex(0x000000), LV_OPA_TRANSP);
-    lv_obj_align(s_canvas_alert, LV_ALIGN_TOP_MID, 0, 5);
+    lv_obj_align(s_canvas_alert, LV_ALIGN_TOP_MID, 0, 4);
 
-    // Distance text (số m/km) centered, pushed down by 18px (2/3 of image size) below canvas
+    // Distance text (số m/km) centered, pushed down by 2/3 of image size below canvas
     s_lbl_alert_dst = lv_label_create(s_obj_alert_main);
     lv_label_set_text(s_lbl_alert_dst, "270 M");
     lv_obj_set_style_text_font(s_lbl_alert_dst, &font_vietnam_16, 0);
