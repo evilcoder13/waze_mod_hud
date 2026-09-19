@@ -20,6 +20,14 @@ Chân thành cảm ơn đội ngũ phát triển và cộng đồng **Waze Mod V
 
 ---
 
+<p align="center">
+  <img src="docs/images/hud-preview.png" alt="WazeHUD CYD v1.5.0 Final Showcase" width="560" />
+  <br>
+  <em>Giao diện hiển thị thực tế của WazeHUD CYD v1.5.0 trên xe hơi: Cảnh báo Camera phạt nguội, tốc độ thực tế, biển giới hạn tốc độ thường trực 60 và nút LẬT hắt kính lái</em>
+</p>
+
+---
+
 ## 📸 Tính năng nổi bật
 
 - **Kết nối Bluetooth Classic SPP tự động**: Pair thiết bị với tên `WazeHUD`, mở Waze Mod là tự nhận diện và stream dữ liệu tức thì ở tần số cao (8 Hz).
@@ -135,7 +143,42 @@ pio device monitor
 
 ---
 
-## ☕ Support & Ủng hộ tác giả
+## 📖 Tài liệu Chuyên sâu (Wiki Documentation)
 
-If you're happy with this project, you can always make me happier by contributing above or by buying me some beers at:
-👉 **[paypal.me/evilcoder13](http://paypal.me/evilcoder13)**
+Dự án cung cấp bộ tài liệu phân tích kỹ thuật chi tiết tại thư mục **[`wiki/`](./wiki/)**:
+* 🔄 **[Mô hình Hoạt động Toàn diện: Waze Mod ➔ Bluetooth SPP ➔ HUD ➔ Kính Lái](./wiki/Model-Waze-Bluetooth-HUD-Mirror.md)**: Phân tích kiến trúc luồng dữ liệu, FreeRTOS 2 nhân, giao thức HLP/1 8Hz, cơ chế lật gương phần cứng LCD MADCTL và nguyên lý quang học hắt kính lái xe hơi.
+* 🛠️ **[Hướng Dẫn Cài Đặt, Ghép Đôi & Vận Hành](./wiki/Setup-and-Usage-Guide.md)**: Hướng dẫn nạp firmware (mẹo nút `BOOT` tránh lỗi flash WebSerial), ghép đôi Bluetooth Android và lắp đặt taplo xe.
+
+---
+
+## 📝 Lịch sử Cập nhật (Changelog Highlights)
+
+Xem toàn văn lịch sử phát triển chi tiết tại **[`CHANGELOG.md`](./CHANGELOG.md)**.
+
+* **[v1.5.0] (2026-09-19)**:
+  - 🚀 **Chuẩn hóa Giao diện Thực tế**: Bố cục Dashboard sắc nét, độ tương phản cao, tối ưu 100% diện tích màn hình LCD 2.8" (320 × 240).
+  - 🛑 **Biển Giới Hạn Tốc Độ Thường Trực**: Luôn hiển thị biển tròn viền đỏ nền trắng số đen chuẩn giao thông VN, tích hợp bộ nhớ lưu giữ tốc độ gần nhất khi Waze tạm thời chưa có dữ liệu (`lim = 0`).
+  - 📷 **Phóng to Icon Cảnh báo 1.5x (38 × 38 px)**: Tách riêng icon Camera/đèn tín hiệu và cự ly mét, triệt tiêu hoàn toàn hiện tượng đè chữ.
+  - 🪞 **Lật Gương Hắt Kính Ngang (Horizontal Mirror Flip)**: Can thiệp trực tiếp thanh ghi phần cứng LCD MADCTL để lật ngược trục X hắt lên kính lái thuận mắt; hỗ trợ chuyển đổi linh hoạt qua nút cảm ứng `LẬT` và nút cứng `BOOT` (GPIO 0).
+* **[v1.3.1] (2026-09-15)**:
+  - ↗️ Triển khai bộ vẽ vector động bằng LVGL Canvas cho toàn bộ mũi tên chỉ hướng (thân dày bo cong, U-turn chữ U ngược, bùng binh).
+  - 🔘 Bổ sung cơ chế lật màn hình bằng nút vật lý `BOOT` trên bo mạch.
+* **[v1.3.0] (2026-09-14)**:
+  - 🕒 Bổ sung đồng hồ thời gian thực từ dữ liệu Waze Telemetry; tinh chỉnh Split Footer chia đôi tên đường và thông tin chuyến đi.
+
+---
+
+## ☕ Mời Mình Ly Cà Phê Nhé! (Buy Me a Coffee)
+
+Nếu chiếc **WazeHUD CYD** này giúp bạn lái xe an toàn hơn, biến chiếc màn hình nhỏ thành món đồ chơi công nghệ hữu ích trên xe hơi, hoặc đơn giản là giúp bạn tiết kiệm được vài giờ vọc vạch config:
+
+Bạn có thể tiếp thêm chút cafein cho tác giả thức đêm fix bug và viết thêm tính năng hay ho tại:
+
+* 🌍 **PayPal**: [paypal.me/evilcoder13](https://paypal.me/evilcoder13) (`evilcoder13`)
+* 🇻🇳 **MoMo / Chuyển khoản nhanh**: `0989993597`
+
+<p align="center">
+  <img src="docs/images/momo-qr.png" alt="MoMo QR Code" width="220" />
+  <br>
+  <em>Cảm ơn sự ủng hộ và đồng hành của bạn! Chúc bạn vạn dặm bình an! 🎉</em>
+</p>

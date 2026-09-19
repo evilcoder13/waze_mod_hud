@@ -2,6 +2,27 @@
 
 Tất cả những thay đổi nổi bật của dự án **WazeHUD CYD** sẽ được lưu lại tại tài liệu này theo quy chuẩn [Semantic Versioning](https://semver.org/).
 
+## [v1.5.0] - 2026-09-19
+
+### 🚀 Giao diện Hoàn thiện & Đồng bộ Trải nghiệm Thực tế (Final HUD UI & Experience)
+- **Chuẩn hóa Giao diện Dashboard Thực tế (Final Showcase)**:
+  - Bố cục Dashboard sắc nét, độ tương phản cao, cân đối hoàn hảo trên màn hình LCD 2.8" (320 × 240).
+  - Thanh Alert Bar đỉnh màu đỏ nổi bật hiển thị cảnh báo thời gian thực kèm cự ly mét chính xác (`CAM ĐÈN ĐỎ (270 m)`), tích hợp nút cảm ứng chuyển chế độ `LẬT` / `HUD`.
+  - Bộ mũi tên chỉ hướng Cyan bo cong mềm mại theo phong cách Waze Mod: rẽ trái/phải, rẽ nhánh, vòng xuyến bùng binh và quay đầu U-Turn chuẩn chữ U ngược có mũi tên chỉ xuống.
+  - Cụm tốc độ trung tâm với font Montserrat 48 cực lớn, tự đổi màu đỏ rực khi vượt tốc độ cho phép.
+  - Tích hợp đồng hồ thời gian thực tính toán tự động từ telemetry chuyến đi của Waze.
+- **Biển báo Giới hạn Tốc độ Thường trực (Permanent Speed Limit Sign with Fallback Memory)**:
+  - Giữ cố định biển báo tròn viền đỏ nền trắng số đen theo quy chuẩn giao thông Việt Nam, loại bỏ hoàn toàn hiện tượng biển báo bị ẩn hay chớp tắt khi xe dừng đèn đỏ hoặc khi Waze gửi `lim = 0`.
+  - Tự động ghi nhớ và duy trì giá trị tốc độ giới hạn hợp lệ gần nhất (hoặc mặc định 60 km/h).
+- **Tăng kích thước Biểu tượng Cảnh báo & Sắp xếp Trực quan**:
+  - Tăng kích thước Icon cảnh báo lên 1.5 lần (38 × 38 px) hiển thị sắc nét chi tiết Camera và cột đèn tín hiệu (Đỏ - Vàng - Xanh).
+  - Căn chỉnh nhãn khoảng cách mét/km nằm ngay ngắn phía dưới icon, triệt tiêu hoàn toàn hiện tượng đè chữ.
+- **Cơ chế Lật gương Hắt kính Chuẩn xác (Horizontal Windshield Mirror Flip)**:
+  - Điều khiển trực tiếp thanh ghi LCD MADCTL phần cứng để lật gương chiều ngang (Horizontal Flip / Mirror) theo trục X. Khi đặt màn hình ngửa trên taplo, hình ảnh phản chiếu lên kính lái xe hơi (HUD hắt kính) sẽ hiển thị đúng chiều chữ và hướng rẽ.
+  - Hỗ trợ chuyển đổi kép: Chạm nút `LẬT` trên màn hình cảm ứng hoặc bấm nút bấm vật lý `BOOT` (GPIO 0) trên board CYD.
+
+---
+
 ## [v1.3.1] - 2026-09-15
 
 ### 🚀 Bê nguyên giao diện & cơ chế HUD từ bản tham khảo
