@@ -43,8 +43,7 @@ static lv_obj_t* s_lbl_clock = nullptr; // Clock in middle space!
 // ==========================================
 static lv_obj_t* s_obj_alert_main = nullptr;
 static lv_obj_t* s_canvas_alert = nullptr;
-static lv_color_t s_alert_cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(22, 22)];
-static lv_obj_t* s_lbl_alert_type = nullptr;
+static lv_color_t s_alert_cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(26, 26)];
 static lv_obj_t* s_lbl_alert_dst = nullptr;
 
 static lv_obj_t* s_obj_sub_alr1 = nullptr;
@@ -241,7 +240,7 @@ void HudScreen::createHudScreen() {
     // =======================================================
     // Primary Alert Card (With Camera / Hazard Graphic Canvas)
     s_obj_alert_main = lv_obj_create(s_scr_hud);
-    lv_obj_set_size(s_obj_alert_main, 84, 56);
+    lv_obj_set_size(s_obj_alert_main, 84, 72);
     lv_obj_set_pos(s_obj_alert_main, 230, 34);
     lv_obj_set_style_radius(s_obj_alert_main, 6, 0);
     lv_obj_set_style_bg_color(s_obj_alert_main, lv_color_hex(0x181824), 0);
@@ -250,26 +249,18 @@ void HudScreen::createHudScreen() {
     lv_obj_set_style_pad_all(s_obj_alert_main, 0, 0);
     lv_obj_clear_flag(s_obj_alert_main, LV_OBJ_FLAG_SCROLLABLE);
 
-    // Alert Canvas (22x22 px on top-left of card)
+    // Alert Canvas (26x26 px centered horizontally at top)
     s_canvas_alert = lv_canvas_create(s_obj_alert_main);
-    lv_canvas_set_buffer(s_canvas_alert, s_alert_cbuf, 22, 22, LV_IMG_CF_TRUE_COLOR);
+    lv_canvas_set_buffer(s_canvas_alert, s_alert_cbuf, 26, 26, LV_IMG_CF_TRUE_COLOR);
     lv_canvas_fill_bg(s_canvas_alert, lv_color_hex(0x000000), LV_OPA_TRANSP);
-    lv_obj_set_pos(s_canvas_alert, 5, 5);
+    lv_obj_align(s_canvas_alert, LV_ALIGN_TOP_MID, 0, 5);
 
-    // Alert Type Name (Next to icon on top row)
-    s_lbl_alert_type = lv_label_create(s_obj_alert_main);
-    lv_label_set_text(s_lbl_alert_type, "ĐÈN ĐỎ");
-    lv_obj_set_style_text_font(s_lbl_alert_type, &font_vietnam_16, 0);
-    lv_obj_set_style_text_color(s_lbl_alert_type, lv_color_hex(0x00E5FF), 0);
-    lv_obj_set_pos(s_lbl_alert_type, 29, 6);
-    lv_obj_set_width(s_lbl_alert_type, 52);
-
-    // Distance on bottom row (Centered)
+    // Distance text (số m/km) centered, pushed down by 18px (2/3 of image size) below canvas
     s_lbl_alert_dst = lv_label_create(s_obj_alert_main);
     lv_label_set_text(s_lbl_alert_dst, "270 M");
     lv_obj_set_style_text_font(s_lbl_alert_dst, &font_vietnam_16, 0);
     lv_obj_set_style_text_color(s_lbl_alert_dst, lv_color_hex(0xFFEB3B), 0); // Yellow
-    lv_obj_align(s_lbl_alert_dst, LV_ALIGN_BOTTOM_MID, 0, -4);
+    lv_obj_align(s_lbl_alert_dst, LV_ALIGN_TOP_MID, 0, 49);
 
     lv_obj_add_flag(s_obj_alert_main, LV_OBJ_FLAG_HIDDEN);
 
@@ -277,7 +268,7 @@ void HudScreen::createHudScreen() {
     // Sign 1
     s_obj_sub_alr1 = lv_obj_create(s_scr_hud);
     lv_obj_set_size(s_obj_sub_alr1, 34, 34);
-    lv_obj_set_pos(s_obj_sub_alr1, 232, 94);
+    lv_obj_set_pos(s_obj_sub_alr1, 232, 112);
     lv_obj_set_style_radius(s_obj_sub_alr1, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_bg_color(s_obj_sub_alr1, lv_color_hex(0xFFFFFF), 0);
     lv_obj_set_style_border_color(s_obj_sub_alr1, lv_color_hex(0x00E5FF), 0);
@@ -294,7 +285,7 @@ void HudScreen::createHudScreen() {
     lv_label_set_text(s_lbl_sub_alr1_dst, "");
     lv_obj_set_style_text_font(s_lbl_sub_alr1_dst, &font_vietnam_16, 0);
     lv_obj_set_style_text_color(s_lbl_sub_alr1_dst, lv_color_hex(0x00E5FF), 0);
-    lv_obj_set_pos(s_lbl_sub_alr1_dst, 226, 130);
+    lv_obj_set_pos(s_lbl_sub_alr1_dst, 226, 148);
 
     lv_obj_add_flag(s_obj_sub_alr1, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(s_lbl_sub_alr1_dst, LV_OBJ_FLAG_HIDDEN);
@@ -302,7 +293,7 @@ void HudScreen::createHudScreen() {
     // Sign 2
     s_obj_sub_alr2 = lv_obj_create(s_scr_hud);
     lv_obj_set_size(s_obj_sub_alr2, 34, 34);
-    lv_obj_set_pos(s_obj_sub_alr2, 276, 94);
+    lv_obj_set_pos(s_obj_sub_alr2, 276, 112);
     lv_obj_set_style_radius(s_obj_sub_alr2, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_bg_color(s_obj_sub_alr2, lv_color_hex(0xFFFFFF), 0);
     lv_obj_set_style_border_color(s_obj_sub_alr2, lv_color_hex(0x00E5FF), 0);
@@ -319,7 +310,7 @@ void HudScreen::createHudScreen() {
     lv_label_set_text(s_lbl_sub_alr2_dst, "");
     lv_obj_set_style_text_font(s_lbl_sub_alr2_dst, &font_vietnam_16, 0);
     lv_obj_set_style_text_color(s_lbl_sub_alr2_dst, lv_color_hex(0x00E5FF), 0);
-    lv_obj_set_pos(s_lbl_sub_alr2_dst, 270, 130);
+    lv_obj_set_pos(s_lbl_sub_alr2_dst, 270, 148);
 
     lv_obj_add_flag(s_obj_sub_alr2, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(s_lbl_sub_alr2_dst, LV_OBJ_FLAG_HIDDEN);
@@ -482,24 +473,6 @@ void HudScreen::updateData(const HudState& state) {
         if (s_last_drawn_alr != state.alr) {
             draw_alert_icon_canvas(s_canvas_alert, state.alr);
             s_last_drawn_alr = state.alr;
-
-            const char* type_str = "CHÚ Ý";
-            switch (state.alr) {
-                case 1: type_str = "C.SÁT"; break;
-                case 2: type_str = "CAMERA"; break;
-                case 3: type_str = "ĐÈN ĐỎ"; break;
-                case 4: type_str = "CHÚ Ý"; break;
-                case 5: type_str = "TAI NẠN"; break;
-                case 6: type_str = "ÙN TẮC"; break;
-                case 8: type_str = "HẠ TỐC"; break;
-                case 9: type_str = "TỐC ĐỘ"; break;
-                case 18: type_str = "NGUY HIỂM"; break;
-                case 21: type_str = "BẮN TỐC ĐỘ"; break;
-                default: type_str = "CHÚ Ý"; break;
-            }
-            if (s_lbl_alert_type) {
-                lv_label_set_text(s_lbl_alert_type, type_str);
-            }
         }
 
         if (state.alrD >= 0) {
@@ -509,6 +482,7 @@ void HudScreen::updateData(const HudState& state) {
                 snprintf(buf, sizeof(buf), "%d M", state.alrD);
             }
             lv_label_set_text(s_lbl_alert_dst, buf);
+            lv_obj_align(s_lbl_alert_dst, LV_ALIGN_TOP_MID, 0, 49);
         } else {
             lv_label_set_text(s_lbl_alert_dst, "");
         }

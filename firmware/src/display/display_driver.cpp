@@ -12,7 +12,7 @@ static lv_disp_draw_buf_t s_draw_buf;
 static lv_color_t s_buf1[SCREEN_WIDTH * 10];
 static lv_color_t s_buf2[SCREEN_WIDTH * 10];
 
-// Mirror HUD state: 0 = Normal Landscape (Rotation 1), 1 = Mirrored HUD (Rotation 7)
+// Mirror HUD state: 0 = Normal Landscape (Rotation 1), 1 = Mirrored HUD (Rotation 5 - Flip Ngang)
 static bool s_is_mirrored = false;
 
 static void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p) {
@@ -71,8 +71,8 @@ void DisplayDriver::setBrightness(uint8_t percent) {
 void DisplayDriver::toggleMirror() {
     s_is_mirrored = !s_is_mirrored;
     if (s_is_mirrored) {
-        s_tft.setRotation(7); // Inverted/Mirrored Landscape for windshield reflection
-        LOG_I("HUD Mode: Windshield Mirror Reflection (Rotation 7)");
+        s_tft.setRotation(5); // Horizontal Mirror Flip (FLIP NGANG) for windshield reflection
+        LOG_I("HUD Mode: Windshield Mirror Reflection (Rotation 5 - Flip Ngang)");
     } else {
         s_tft.setRotation(1); // Normal Landscape
         LOG_I("HUD Mode: Normal Direct View (Rotation 1)");
