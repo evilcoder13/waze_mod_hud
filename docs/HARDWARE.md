@@ -44,15 +44,15 @@ ESP32-2432S028 is a development board featuring:
 
 ---
 
-## SPI Bus — Touch (XPT2046)
+## SPI Bus — Touch (XPT2046, Dedicated VSPI Bus)
 
 | Signal | GPIO | Notes |
 |--------|------|-------|
-| MOSI | 13 | Shared with display |
-| MISO | 12 | Shared with touch |
-| SCK | 14 | Shared with display |
-| CS (touch) | **33** | Active LOW |
-| IRQ | **36** | Touch interrupt (INPUT_PULLUP) |
+| T_CLK / SCK | **25** | Dedicated touch SPI clock |
+| T_OUT / MISO | **39** | Touch data out (ESP32 input only) |
+| T_DIN / MOSI | **32** | Touch data in |
+| T_CS | **33** | Active LOW |
+| T_IRQ | **36** | Touch interrupt (INPUT_PULLUP) |
 
 ---
 
@@ -143,9 +143,12 @@ constexpr int PIN_TFT_CS   = 15;
 constexpr int PIN_TFT_DC   =  2;
 constexpr int PIN_TFT_BL   = 21;   // backlight PWM
 
-// XPT2046 touch
-constexpr int PIN_TOUCH_CS  = 33;
-constexpr int PIN_TOUCH_IRQ = 36;
+// XPT2046 touch (dedicated VSPI)
+constexpr int PIN_TOUCH_CLK  = 25;
+constexpr int PIN_TOUCH_MISO = 39;
+constexpr int PIN_TOUCH_MOSI = 32;
+constexpr int PIN_TOUCH_CS   = 33;
+constexpr int PIN_TOUCH_IRQ  = 36;
 
 // RGB LED (active LOW)
 constexpr int PIN_LED_RED   =  4;

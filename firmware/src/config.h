@@ -23,9 +23,12 @@ constexpr int PIN_TFT_DC   = 2;
 constexpr int PIN_TFT_RST  = -1; // Connected to EN
 constexpr int PIN_TFT_BL   = 21; // Backlight PWM (active HIGH)
 
-// Touch XPT2046 SPI
-constexpr int PIN_TOUCH_CS  = 33;
-constexpr int PIN_TOUCH_IRQ = 36;
+// Touch XPT2046 SPI (CYD ESP32-2432S028 dedicated VSPI bus)
+constexpr int PIN_TOUCH_CLK  = 25;
+constexpr int PIN_TOUCH_MISO = 39;
+constexpr int PIN_TOUCH_MOSI = 32;
+constexpr int PIN_TOUCH_CS   = 33;
+constexpr int PIN_TOUCH_IRQ  = 36;
 
 // Physical Button (BOOT button on ESP32 CYD - GPIO 0)
 constexpr int PIN_BUTTON_BOOT = 0;

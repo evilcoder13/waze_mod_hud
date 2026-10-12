@@ -1,4 +1,6 @@
 #include "display_driver.h"
+#include <SPI.h>
+#include <XPT2046_Touchscreen.h>
 #include <TFT_eSPI.h>
 #include <lvgl.h>
 #include "config.h"
@@ -7,6 +9,13 @@
 #include "utils/logger.h"
 
 static TFT_eSPI s_tft = TFT_eSPI();
+static SPIClass s_touch_spi = SPIClass(VSPI);
+static XPT2046_Touchscreen s_ts(PIN_TOUCH_CS, PIN_TOUCH_IRQ);
+
+// Calibration range for 2.8" CYD resistive touchscreen (ESP32-2432S028 G205)
+static uint16_t s_touch_min_x = 200, s_touch_max_x = 3700;
+static uint16_t s_touch_min_y = 240, s_touch_max_y = 3800;
+
 static SemaphoreHandle_t s_lvgl_mutex = nullptr;
 static lv_disp_draw_buf_t s_draw_buf;
 static lv_color_t s_buf1[SCREEN_WIDTH * 10];
@@ -29,17 +38,38 @@ static void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t
 
 // Touch input read callback for XPT2046 sending points to LVGL
 static void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data) {
-    uint16_t touchX = 0, touchY = 0;
-    // TFT_eSPI handles calibration and rotation internally
-    bool touched = s_tft.getTouch(&touchX, &touchY, 400);
-
     static bool s_last_touched = false;
     static uint32_t s_touch_press_time = 0;
+    static int16_t s_last_x = 0, s_last_y = 0;
 
-    if (touched) {
+    if (s_ts.touched()) {
+        TS_Point p = s_ts.getPoint();
+
+        // Dynamic auto-calibration bounds (prevent out of range while adapting to panel variation)
+        if (p.x < s_touch_min_x && p.x > 50)   s_touch_min_x = p.x;
+        if (p.x > s_touch_max_x && p.x < 4050) s_touch_max_x = p.x;
+        if (p.y < s_touch_min_y && p.y > 50)   s_touch_min_y = p.y;
+        if (p.y > s_touch_max_y && p.y < 4050) s_touch_max_y = p.y;
+
+        int16_t px = map(p.x, s_touch_min_x, s_touch_max_x, 0, SCREEN_WIDTH);
+        int16_t py = map(p.y, s_touch_min_y, s_touch_max_y, 0, SCREEN_HEIGHT);
+
+        if (px < 0) px = 0;
+        if (px >= SCREEN_WIDTH) px = SCREEN_WIDTH - 1;
+        if (py < 0) py = 0;
+        if (py >= SCREEN_HEIGHT) py = SCREEN_HEIGHT - 1;
+
+        // When in mirrored HUD mode, invert X so touch aligns with optically flipped display
+        if (s_is_mirrored) {
+            px = SCREEN_WIDTH - 1 - px;
+        }
+
+        data->point.x = px;
+        data->point.y = py;
         data->state = LV_INDEV_STATE_PR;
-        data->point.x = touchX;
-        data->point.y = touchY;
+
+        s_last_x = px;
+        s_last_y = py;
 
         if (!s_last_touched) {
             s_touch_press_time = millis();
@@ -47,13 +77,13 @@ static void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data
         s_last_touched = true;
     } else {
         data->state = LV_INDEV_STATE_REL;
-        // If user tapped anywhere on screen, allow toggling mirror if desired
+        // If user tapped on top bar or HUD toggle area, toggle mirror mode
         if (s_last_touched) {
             uint32_t press_duration = millis() - s_touch_press_time;
-            if (press_duration >= 40 && press_duration <= 1200) {
-                // Check if user tapped in top-right or anywhere on the top bar
-                if (data->point.y <= 45 || data->point.x >= 220) {
-                    LOG_I("Screen tap detected on HUD toggle area! Toggling Mirror HUD mode");
+            if (press_duration >= 40 && press_duration <= 1500) {
+                if (s_last_y <= 50 || s_last_x >= 220) {
+                    LOG_I("Touch tap detected on HUD toggle area (x=%d, y=%d)! Toggling Mirror HUD mode",
+                          s_last_x, s_last_y);
                     DisplayDriver::toggleMirror();
                 }
             }
@@ -127,8 +157,13 @@ static void renderTask(void* param) {
 bool DisplayDriver::init(SemaphoreHandle_t lvgl_mutex) {
     s_lvgl_mutex = lvgl_mutex;
 
-    // 1. Configure Touch IRQ pin
+    // 1. Configure and Initialize Touch Hardware via XPT2046 on dedicated VSPI bus
     pinMode(PIN_TOUCH_IRQ, INPUT_PULLUP);
+    s_touch_spi.begin(PIN_TOUCH_CLK, PIN_TOUCH_MISO, PIN_TOUCH_MOSI, PIN_TOUCH_CS);
+    s_ts.begin(s_touch_spi);
+    s_ts.setRotation(1); // Matches Landscape orientation
+    LOG_I("XPT2046 Touch controller initialized on VSPI (CLK=%d, MISO=%d, MOSI=%d, CS=%d, IRQ=%d)",
+          PIN_TOUCH_CLK, PIN_TOUCH_MISO, PIN_TOUCH_MOSI, PIN_TOUCH_CS, PIN_TOUCH_IRQ);
 
     // 2. Backlight PWM setup
     ledcSetup(BL_PWM_CHANNEL, BL_PWM_FREQ, BL_PWM_RES_BITS);
@@ -139,10 +174,6 @@ bool DisplayDriver::init(SemaphoreHandle_t lvgl_mutex) {
     s_tft.init();
     s_tft.setRotation(DISPLAY_ROTATION); // Default: 1 (Landscape)
     s_tft.fillScreen(TFT_BLACK);
-
-    // Touch calibration data for ESP32-2432S028 CYD in landscape
-    uint16_t calData[5] = { 260, 3600, 350, 3450, 1 };
-    s_tft.setTouch(calData);
 
     // 4. LVGL Init
     lv_init();

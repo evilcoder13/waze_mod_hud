@@ -328,6 +328,7 @@ void HudScreen::createHudScreen() {
     lv_obj_set_pos(s_bar_bottom, 0, 175);
     lv_obj_set_style_radius(s_bar_bottom, 0, 0);
     lv_obj_set_style_border_width(s_bar_bottom, 0, 0);
+    lv_obj_set_style_pad_all(s_bar_bottom, 0, 0);
     lv_obj_set_style_bg_color(s_bar_bottom, lv_color_hex(0x000000), 0); // Pure Black
     lv_obj_clear_flag(s_bar_bottom, LV_OBJ_FLAG_SCROLLABLE);
 
@@ -567,7 +568,7 @@ void HudScreen::updateData(const HudState& state) {
         }
 
         if (strlen(eta_buf) > 0 && strlen(dist_buf) > 0) {
-            snprintf(buf, sizeof(buf), "%s • Còn %s", eta_buf, dist_buf);
+            snprintf(buf, sizeof(buf), "%s\nCòn %s", eta_buf, dist_buf);
         } else if (strlen(eta_buf) > 0) {
             snprintf(buf, sizeof(buf), "%s", eta_buf);
         } else {
