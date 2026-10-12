@@ -2,6 +2,21 @@
 
 Tất cả những thay đổi nổi bật của dự án **WazeHUD CYD** sẽ được lưu lại tại tài liệu này theo quy chuẩn [Semantic Versioning](https://semver.org/).
 
+## [v1.5.1] - 2026-10-12
+
+### 🛠️ Sửa lỗi Phần cứng Cảm ứng & Hoàn thiện Giao diện (Touch Controller Fix & UI Polish)
+- **Khắc phục Triệt để Cảm ứng Màn hình ESP32 CYD 2.8" (G205 Resistive Touch XPT2046)**:
+  - **Cô lập Bus SPI (HSPI vs VSPI)**: Tách màn hình TFT chạy độc lập trên **HSPI** (`-DUSE_HSPI_PORT=1`), giải phóng hoàn toàn bus **VSPI** (`CLK=25, MISO=39, MOSI=32, CS=33`) cho chip cảm ứng XPT2046, loại bỏ triệt để xung đột bus phần cứng khiến cảm ứng bị đóng băng.
+  - **Gỡ bỏ Xung đột CS Pin 33**: Loại bỏ `-DTOUCH_CS` khỏi cấu hình nội bộ của `TFT_eSPI` để trao toàn quyền điều khiển cho thư viện chuyên dụng `PaulStoffregen/XPT2046_Touchscreen`.
+  - **Chống Treo Ngắt IRQ (GPIO 36)**: Chuyển driver cảm ứng sang chế độ Polling trực tiếp qua SPI bus (áp lực $Z > 150$), loại bỏ hiện tượng treo ngắt chân `SENSOR_VP` (GPIO 36) do nhiễu sóng khi kích hoạt Bluetooth Classic.
+  - **Ánh xạ Tọa độ Đảo chiều Khi Lật HUD**: Tự động đảo trục X tọa độ cảm ứng khi chuyển sang chế độ lật gương hắt kính lái (Mirror Mode) để chạm đúng vị trí nút bấm trên kính.
+  - **Tích hợp Nhật ký Cảm ứng Thời gian thực**: In chi tiết tọa độ raw và lực nhấn qua cổng Serial Monitor (115200 baud) giúp kiểm tra phần cứng nhanh chóng.
+- **Tinh chỉnh Bố cục Footer Chân Màn hình (Split Footer)**:
+  - Tách thông tin chuyến đi ở góc dưới bên phải (`s_lbl_eta_info`) thành 2 dòng riêng biệt: Giờ đến dự kiến (ETA) ở dòng 1 và Quãng đường còn lại ở dòng 2 (vd: `14:30\nCòn 5.2 km`), không còn bị dồn chữ hay tràn khung.
+  - Tối ưu khoảng đệm viền thanh footer (`pad = 0`), hiển thị thông tin rõ ràng và dễ nhìn từ ghế lái.
+
+---
+
 ## [v1.5.0] - 2026-09-19
 
 ### 🚀 Giao diện Hoàn thiện & Đồng bộ Trải nghiệm Thực tế (Final HUD UI & Experience)

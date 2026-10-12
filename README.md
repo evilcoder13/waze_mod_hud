@@ -155,6 +155,9 @@ Dự án cung cấp bộ tài liệu phân tích kỹ thuật chi tiết tại t
 
 Xem toàn văn lịch sử phát triển chi tiết tại **[`CHANGELOG.md`](./CHANGELOG.md)**.
 
+* **[v1.5.1] (2026-10-12)**:
+  - 👆 **Khắc phục Triệt để Cảm ứng CYD (XPT2046)**: Cô lập hoàn toàn bus phần cứng (HSPI cho màn hình LCD, VSPI độc quyền cho cảm ứng XPT2046); chuyển sang chế độ Polling trực tiếp chống treo ngắt IRQ khi dùng Bluetooth; hỗ trợ đảo trục cảm ứng khi lật kính.
+  - 📏 **Tách Dòng Thông tin Footer Chuyến đi**: Hiển thị Giờ đến (ETA) và Quãng đường còn lại thành 2 dòng riêng biệt, rõ ràng, không bị cấn chữ.
 * **[v1.5.0] (2026-09-19)**:
   - 🚀 **Chuẩn hóa Giao diện Thực tế**: Bố cục Dashboard sắc nét, độ tương phản cao, tối ưu 100% diện tích màn hình LCD 2.8" (320 × 240).
   - 🛑 **Biển Giới Hạn Tốc Độ Thường Trực**: Luôn hiển thị biển tròn viền đỏ nền trắng số đen chuẩn giao thông VN, tích hợp bộ nhớ lưu giữ tốc độ gần nhất khi Waze tạm thời chưa có dữ liệu (`lim = 0`).
