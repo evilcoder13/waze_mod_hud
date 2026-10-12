@@ -10,7 +10,8 @@
 
 static TFT_eSPI s_tft = TFT_eSPI();
 static SPIClass s_touch_spi = SPIClass(VSPI);
-static XPT2046_Touchscreen s_ts(PIN_TOUCH_CS, PIN_TOUCH_IRQ);
+// Use Polling Mode (pass only CS pin) to avoid GPIO 36 IRQ lockups when WiFi/BT are active
+static XPT2046_Touchscreen s_ts(PIN_TOUCH_CS);
 
 // Calibration range for 2.8" CYD resistive touchscreen (ESP32-2432S028 G205)
 static uint16_t s_touch_min_x = 200, s_touch_max_x = 3700;
@@ -41,55 +42,69 @@ static void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data
     static bool s_last_touched = false;
     static uint32_t s_touch_press_time = 0;
     static int16_t s_last_x = 0, s_last_y = 0;
+    static uint32_t s_last_debug_ms = 0;
 
-    if (s_ts.touched()) {
+    // Direct check on XPT2046
+    bool is_touched = s_ts.touched();
+
+    if (is_touched) {
         TS_Point p = s_ts.getPoint();
 
-        // Dynamic auto-calibration bounds (prevent out of range while adapting to panel variation)
-        if (p.x < s_touch_min_x && p.x > 50)   s_touch_min_x = p.x;
-        if (p.x > s_touch_max_x && p.x < 4050) s_touch_max_x = p.x;
-        if (p.y < s_touch_min_y && p.y > 50)   s_touch_min_y = p.y;
-        if (p.y > s_touch_max_y && p.y < 4050) s_touch_max_y = p.y;
+        // Filter false touches or noise
+        if (p.z > 150) {
+            // Dynamic auto-calibration bounds
+            if (p.x < s_touch_min_x && p.x > 30)   s_touch_min_x = p.x;
+            if (p.x > s_touch_max_x && p.x < 4080) s_touch_max_x = p.x;
+            if (p.y < s_touch_min_y && p.y > 30)   s_touch_min_y = p.y;
+            if (p.y > s_touch_max_y && p.y < 4080) s_touch_max_y = p.y;
 
-        int16_t px = map(p.x, s_touch_min_x, s_touch_max_x, 0, SCREEN_WIDTH);
-        int16_t py = map(p.y, s_touch_min_y, s_touch_max_y, 0, SCREEN_HEIGHT);
+            int16_t px = map(p.x, s_touch_min_x, s_touch_max_x, 0, SCREEN_WIDTH);
+            int16_t py = map(p.y, s_touch_min_y, s_touch_max_y, 0, SCREEN_HEIGHT);
 
-        if (px < 0) px = 0;
-        if (px >= SCREEN_WIDTH) px = SCREEN_WIDTH - 1;
-        if (py < 0) py = 0;
-        if (py >= SCREEN_HEIGHT) py = SCREEN_HEIGHT - 1;
+            if (px < 0) px = 0;
+            if (px >= SCREEN_WIDTH) px = SCREEN_WIDTH - 1;
+            if (py < 0) py = 0;
+            if (py >= SCREEN_HEIGHT) py = SCREEN_HEIGHT - 1;
 
-        // When in mirrored HUD mode, invert X so touch aligns with optically flipped display
-        if (s_is_mirrored) {
-            px = SCREEN_WIDTH - 1 - px;
+            // When in mirrored HUD mode, invert X so touch aligns with optically flipped display
+            if (s_is_mirrored) {
+                px = SCREEN_WIDTH - 1 - px;
+            }
+
+            data->point.x = px;
+            data->point.y = py;
+            data->state = LV_INDEV_STATE_PR;
+
+            s_last_x = px;
+            s_last_y = py;
+
+            uint32_t now = millis();
+            if (now - s_last_debug_ms > 250) {
+                s_last_debug_ms = now;
+                LOG_I("TOUCH PRESSED: raw(x=%d, y=%d, z=%d) -> px=%d, py=%d", p.x, p.y, p.z, px, py);
+            }
+
+            if (!s_last_touched) {
+                s_touch_press_time = millis();
+            }
+            s_last_touched = true;
+            return;
         }
+    }
 
-        data->point.x = px;
-        data->point.y = py;
-        data->state = LV_INDEV_STATE_PR;
-
-        s_last_x = px;
-        s_last_y = py;
-
-        if (!s_last_touched) {
-            s_touch_press_time = millis();
-        }
-        s_last_touched = true;
-    } else {
-        data->state = LV_INDEV_STATE_REL;
-        // If user tapped on top bar or HUD toggle area, toggle mirror mode
-        if (s_last_touched) {
-            uint32_t press_duration = millis() - s_touch_press_time;
-            if (press_duration >= 40 && press_duration <= 1500) {
-                if (s_last_y <= 50 || s_last_x >= 220) {
-                    LOG_I("Touch tap detected on HUD toggle area (x=%d, y=%d)! Toggling Mirror HUD mode",
-                          s_last_x, s_last_y);
-                    DisplayDriver::toggleMirror();
-                }
+    data->state = LV_INDEV_STATE_REL;
+    // If user tapped on top bar or HUD toggle area, toggle mirror mode
+    if (s_last_touched) {
+        uint32_t press_duration = millis() - s_touch_press_time;
+        LOG_I("TOUCH RELEASED after %u ms at last pos (%d, %d)", press_duration, s_last_x, s_last_y);
+        if (press_duration >= 40 && press_duration <= 1500) {
+            if (s_last_y <= 60 || s_last_x >= 210) {
+                LOG_I("Touch tap on HUD toggle button recognized! Toggling Mirror HUD mode");
+                DisplayDriver::toggleMirror();
             }
         }
-        s_last_touched = false;
     }
+    s_last_touched = false;
 }
 
 void DisplayDriver::setBrightness(uint8_t percent) {
